@@ -1,1 +1,799 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Social Drop</title>
 
+<!-- Firebase Compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --blue:#1A73E8; --blue-dark:#1558B0; --blue-light:#E8F0FE;
+  --gold:#FFD700; --bg:#F0F4FF; --white:#FFFFFF;
+  --text:#1A1A2E; --text-light:#6B7280;
+  --border:#E5E7EB; --error:#EF4444; --success:#10B981;
+  --shadow:0 4px 24px rgba(26,115,232,0.10); --radius:16px;
+}
+body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); min-height:100vh; overflow-x:hidden; }
+.page { display:none; min-height:100vh; flex-direction:column; }
+.page.active { display:flex; }
+
+/* SPLASH */
+#splash { background:linear-gradient(145deg,#1A73E8 0%,#1558B0 60%,#0D3B8C 100%); align-items:center; justify-content:center; position:relative; overflow:hidden; }
+#splash::before { content:''; position:absolute; width:400px; height:400px; background:rgba(255,255,255,0.05); border-radius:50%; top:-100px; right:-100px; }
+#splash::after { content:''; position:absolute; width:300px; height:300px; background:rgba(255,215,0,0.08); border-radius:50%; bottom:-80px; left:-80px; }
+.splash-content { text-align:center; z-index:1; animation:splashIn 0.8s ease; }
+.splash-logo { width:90px; height:90px; background:var(--white); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; box-shadow:0 8px 32px rgba(0,0,0,0.2); font-size:42px; }
+.splash-title { font-size:32px; font-weight:800; color:var(--white); }
+.splash-title span { color:var(--gold); }
+.splash-sub { color:rgba(255,255,255,0.7); font-size:14px; margin-top:8px; letter-spacing:1px; }
+.splash-loader { margin-top:60px; display:flex; gap:8px; justify-content:center; }
+.splash-dot { width:8px; height:8px; background:rgba(255,255,255,0.4); border-radius:50%; animation:dotPulse 1.4s infinite; }
+.splash-dot:nth-child(2){animation-delay:0.2s} .splash-dot:nth-child(3){animation-delay:0.4s}
+@keyframes dotPulse{0%,80%,100%{background:rgba(255,255,255,0.3);transform:scale(1)}40%{background:var(--gold);transform:scale(1.3)}}
+@keyframes splashIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* AUTH */
+#login,#register{background:var(--bg);justify-content:flex-start}
+.auth-header{background:linear-gradient(135deg,var(--blue),var(--blue-dark));padding:50px 24px 40px;position:relative;overflow:hidden}
+.auth-header::after{content:'';position:absolute;width:200px;height:200px;background:rgba(255,255,255,0.06);border-radius:50%;top:-60px;right:-40px}
+.auth-header-logo{font-size:26px;font-weight:800;color:var(--white);margin-bottom:6px}
+.auth-header-logo span{color:var(--gold)}
+.auth-header p{color:rgba(255,255,255,0.75);font-size:14px}
+.auth-body{flex:1;padding:28px 20px;overflow-y:auto}
+.auth-card{background:var(--white);border-radius:var(--radius);padding:24px 20px;box-shadow:var(--shadow);margin-bottom:16px}
+.auth-card h2{font-size:20px;font-weight:700;color:var(--text);margin-bottom:20px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px}
+.form-input-wrap{position:relative}
+.form-input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-light)}
+.form-input{width:100%;padding:13px 14px 13px 42px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;color:var(--text);background:#FAFAFA;outline:none;transition:all 0.2s}
+.form-input:focus{border-color:var(--blue);background:var(--white);box-shadow:0 0 0 3px rgba(26,115,232,0.12)}
+.form-input.error{border-color:var(--error)}
+.form-error{font-size:12px;color:var(--error);margin-top:4px;display:none}
+.form-error.show{display:block}
+.form-select{width:100%;padding:13px 14px 13px 42px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;color:var(--text);background:#FAFAFA;outline:none;appearance:none;transition:all 0.2s}
+.form-select:focus{border-color:var(--blue);background:var(--white)}
+.btn{width:100%;padding:15px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.2s}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:var(--white);box-shadow:0 4px 16px rgba(26,115,232,0.35)}
+.btn-primary:active{transform:scale(0.98)}
+.btn-outline{background:transparent;border:1.5px solid var(--blue);color:var(--blue)}
+.btn-loading{opacity:0.8;pointer-events:none}
+.auth-switch{text-align:center;font-size:14px;color:var(--text-light);margin-top:16px}
+.auth-switch a{color:var(--blue);font-weight:600;text-decoration:none}
+.forgot-link{text-align:right;margin-top:-8px;margin-bottom:16px}
+.forgot-link a{font-size:13px;color:var(--blue);text-decoration:none;font-weight:500}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0}
+.divider-line{flex:1;height:1px;background:var(--border)}
+.divider span{font-size:12px;color:var(--text-light)}
+.pass-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-light);padding:0}
+.info-box{background:var(--blue-light);border-left:3px solid var(--blue);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--blue-dark);margin-bottom:16px;line-height:1.6}
+.terms-text{font-size:12px;color:var(--text-light);text-align:center;margin-top:12px;line-height:1.6}
+.terms-text a{color:var(--blue);text-decoration:none;font-weight:500}
+
+/* TOP BAR */
+.top-bar{position:sticky;top:0;z-index:100;background:var(--white);display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.top-bar-logo{font-size:20px;font-weight:800;color:var(--text)}
+.top-bar-logo span{color:var(--blue)}
+.top-bar-icons{display:flex;gap:8px}
+.icon-btn{background:none;border:none;font-size:20px;cursor:pointer;padding:4px;position:relative}
+.notif-dot{position:absolute;top:2px;right:2px;width:8px;height:8px;background:var(--error);border-radius:50%;border:1.5px solid var(--white)}
+.back-btn{background:none;border:none;font-size:14px;font-weight:600;color:var(--blue);cursor:pointer;padding:4px 0}
+.post-submit-btn{background:var(--blue);color:var(--white);border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer}
+
+/* STORY */
+.story-row{display:flex;gap:12px;padding:12px 16px;overflow-x:auto;background:var(--white);border-bottom:1px solid var(--border);scrollbar-width:none}
+.story-row::-webkit-scrollbar{display:none}
+.story-item{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+.story-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--white);background:linear-gradient(135deg,var(--blue),var(--blue-dark));border:3px solid var(--blue)}
+.story-avatar.add-story{background:var(--bg);color:var(--blue);border:2px dashed var(--blue);font-size:20px}
+.story-name{font-size:11px;color:var(--text-light);max-width:56px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* FEED */
+.feed{flex:1;overflow-y:auto;padding:12px 0 80px;background:var(--bg)}
+.post-card{background:var(--white);margin:0 0 10px}
+.post-header{display:flex;align-items:center;padding:12px 14px;gap:10px}
+.post-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--white);flex-shrink:0}
+.post-user-info{flex:1}
+.post-user-name{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:4px}
+.post-time{font-size:11px;color:var(--text-light);margin-top:1px}
+.post-more{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-light)}
+.post-text{padding:0 14px 10px;font-size:14px;line-height:1.6;color:var(--text)}
+.post-img{width:100%;max-height:360px;object-fit:cover;display:block}
+.post-actions{display:flex;padding:10px 14px;gap:20px;border-top:1px solid var(--border)}
+.action-btn{display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--text-light);font-weight:500}
+.action-btn.liked{color:var(--error)}
+.action-btn span{font-size:18px}
+
+/* AD */
+.ad-card{background:var(--white);margin:0 0 10px;border:1px solid #E8F0FE;position:relative}
+.ad-tag{position:absolute;top:8px;right:8px;background:rgba(26,115,232,0.1);color:var(--blue);font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
+.ad-body{padding:14px;display:flex;align-items:center;gap:12px}
+.ad-icon{width:50px;height:50px;border-radius:12px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.ad-title{font-size:14px;font-weight:700;color:var(--text)}
+.ad-desc{font-size:12px;color:var(--text-light);margin-top:2px}
+.ad-cta{margin:0 14px 14px;padding:10px;background:var(--blue-light);color:var(--blue);border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;width:calc(100% - 28px)}
+.ad-banner-small{background:linear-gradient(135deg,#E8F0FE,#F0F4FF);border:1px solid #C5D8FF;margin:10px 12px;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.ad-label{font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-light);padding:2px 8px;border-radius:20px;flex-shrink:0}
+.ad-content{font-size:13px;color:var(--text);font-weight:500}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--white);display:flex;align-items:center;border-top:1px solid var(--border);padding:6px 0 8px;z-index:100;box-shadow:0 -2px 12px rgba(0,0,0,0.06)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;font-size:20px;padding:4px 0}
+.nav-btn span{font-size:10px;color:var(--text-light);font-weight:500}
+.nav-btn.active span{color:var(--blue)}
+.post-plus{width:48px;height:48px;background:linear-gradient(135deg,var(--blue),var(--blue-dark));border-radius:50%;color:var(--white);display:flex;align-items:center;justify-content:center;font-size:26px;margin-top:-20px;box-shadow:0 4px 16px rgba(26,115,232,0.4)}
+
+/* CREATE POST */
+.post-author-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.post-textarea{width:100%;min-height:100px;border:1.5px solid var(--border);border-radius:12px;padding:12px;font-size:15px;color:var(--text);font-family:inherit;resize:none;outline:none;background:#FAFAFA;line-height:1.6}
+.post-textarea:focus{border-color:var(--blue);background:var(--white)}
+.img-upload-box{margin-top:12px;border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s}
+.img-upload-box:hover{border-color:var(--blue);background:var(--blue-light)}
+.post-type-row{display:flex;gap:8px;margin-top:14px}
+.type-btn{flex:1;padding:9px;border:1.5px solid var(--border);border-radius:10px;background:#FAFAFA;font-size:13px;cursor:pointer;font-weight:500;color:var(--text-light);transition:all 0.2s}
+.type-btn.active{border-color:var(--blue);background:var(--blue-light);color:var(--blue);font-weight:700}
+.warn-box{background:#FFF8E1;border-left:3px solid #FFB300;border-radius:8px;padding:12px 14px;font-size:13px;color:#856404;margin-bottom:16px;line-height:1.6}
+.warn-box a{color:var(--blue);font-weight:600;text-decoration:none}
+
+/* PROFILE */
+.profile-header{background:var(--white);padding:24px 20px;text-align:center;border-bottom:1px solid var(--border)}
+.profile-big-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-dark));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:var(--white);margin:0 auto 12px;border:3px solid var(--blue-light)}
+.profile-name{font-size:20px;font-weight:800;color:var(--text);display:flex;align-items:center;justify-content:center;gap:6px}
+.profile-username{font-size:13px;color:var(--text-light);margin-top:2px}
+.profile-bio{font-size:13px;color:var(--text);margin-top:8px;line-height:1.5}
+.profile-stats{display:flex;justify-content:center;margin:16px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.stat-item{flex:1;padding:12px 8px;text-align:center;border-right:1px solid var(--border)}
+.stat-item:last-child{border-right:none}
+.stat-num{font-size:18px;font-weight:800;color:var(--text)}
+.stat-label{font-size:11px;color:var(--text-light);margin-top:2px}
+.profile-actions{display:flex;gap:10px;justify-content:center;margin-top:14px}
+.post-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:10px}
+.grid-item{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer}
+
+/* VERIFY */
+.verify-options{display:flex;gap:10px;margin-bottom:4px}
+.verify-opt{flex:1;border:2px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;transition:all 0.2s;background:#FAFAFA}
+.verify-opt.active{border-color:var(--blue);background:var(--blue-light)}
+.upload-box{border:2px dashed var(--border);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;background:#FAFAFA}
+.upload-box:hover{border-color:var(--blue);background:var(--blue-light)}
+
+/* WALLET */
+.wallet-card{background:linear-gradient(135deg,var(--blue),var(--blue-dark));border-radius:20px;padding:24px;color:var(--white);margin-bottom:16px;position:relative;overflow:hidden}
+.wallet-card::after{content:'💰';position:absolute;right:-10px;top:-10px;font-size:80px;opacity:0.1}
+.wallet-label{font-size:13px;opacity:0.8;margin-bottom:6px}
+.wallet-amount{font-size:36px;font-weight:800}
+.wallet-sub{font-size:12px;opacity:0.7;margin-top:4px}
+.wallet-actions{display:flex;gap:10px;margin-top:16px}
+.wallet-btn{flex:1;padding:10px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer}
+.wallet-btn-white{background:var(--white);color:var(--blue)}
+.wallet-btn-outline{background:rgba(255,255,255,0.2);color:var(--white);border:1px solid rgba(255,255,255,0.4)}
+
+/* LOADING & TOAST */
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,0.9);display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:12px}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--blue-light);border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:14px;color:var(--text-light);font-weight:500}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--text);color:var(--white);padding:12px 20px;border-radius:50px;font-size:14px;font-weight:500;z-index:9999;transition:transform 0.3s ease;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--error)}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div class="page active" id="splash">
+  <div class="splash-content">
+    <div class="splash-logo">🛍️</div>
+    <div class="splash-title">Social <span>Drop</span></div>
+    <div class="splash-sub">পোস্ট করো • কেনো • আয় করো</div>
+    <div class="splash-loader">
+      <div class="splash-dot"></div>
+      <div class="splash-dot"></div>
+      <div class="splash-dot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="page" id="login">
+  <div class="auth-header">
+    <div class="auth-header-logo">Social <span>Drop</span></div>
+    <p>স্বাগতম! লগইন করুন</p>
+  </div>
+  <div class="auth-body">
+    <div class="auth-card">
+      <h2>লগইন করুন</h2>
+      <div class="form-group">
+        <label class="form-label">ইমেইল</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">📧</span>
+          <input type="email" class="form-input" id="login-email" placeholder="আপনার ইমেইল">
+        </div>
+        <div class="form-error" id="login-email-err">সঠিক ইমেইল দিন</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">পাসওয়ার্ড</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">🔒</span>
+          <input type="password" class="form-input" id="login-pass" placeholder="আপনার পাসওয়ার্ড">
+          <button class="pass-toggle" onclick="togglePass('login-pass',this)">👁️</button>
+        </div>
+        <div class="form-error" id="login-pass-err">পাসওয়ার্ড দিন</div>
+      </div>
+      <div class="forgot-link"><a href="#">পাসওয়ার্ড ভুলে গেছেন?</a></div>
+      <button class="btn btn-primary" onclick="doLogin()">লগইন করুন</button>
+      <div class="divider"><div class="divider-line"></div><span>অথবা</span><div class="divider-line"></div></div>
+      <button class="btn btn-outline" onclick="goToPage('register')">নতুন অ্যাকাউন্ট খুলুন</button>
+    </div>
+    <div class="auth-switch">অ্যাকাউন্ট নেই? <a href="#" onclick="goToPage('register')">রেজিস্ট্রেশন করুন</a></div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div class="page" id="register">
+  <div class="auth-header">
+    <div class="auth-header-logo">Social <span>Drop</span></div>
+    <p>নতুন অ্যাকাউন্ট তৈরি করুন</p>
+  </div>
+  <div class="auth-body">
+    <div class="info-box">📌 রেজিস্ট্রেশনের পর ভেরিফাই করলে সব ফিচার পাবেন</div>
+    <div class="auth-card">
+      <h2>রেজিস্ট্রেশন করুন</h2>
+      <div class="form-group">
+        <label class="form-label">পূর্ণ নাম</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">👤</span>
+          <input type="text" class="form-input" id="reg-name" placeholder="আপনার পূর্ণ নাম">
+        </div>
+        <div class="form-error" id="reg-name-err">নাম দিন</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ইউজারনেম</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">@</span>
+          <input type="text" class="form-input" id="reg-username" placeholder="username (ছোট হাতে)">
+        </div>
+        <div class="form-error" id="reg-username-err">সঠিক ইউজারনেম দিন</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ইমেইল</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">📧</span>
+          <input type="email" class="form-input" id="reg-email" placeholder="আপনার ইমেইল">
+        </div>
+        <div class="form-error" id="reg-email-err">সঠিক ইমেইল দিন</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ফোন নম্বর</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">📱</span>
+          <input type="tel" class="form-input" id="reg-phone" placeholder="01XXXXXXXXX">
+        </div>
+        <div class="form-error" id="reg-phone-err">সঠিক ফোন নম্বর দিন</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">লিঙ্গ</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">👥</span>
+          <select class="form-select" id="reg-gender">
+            <option value="">বেছে নিন</option>
+            <option value="male">পুরুষ</option>
+            <option value="female">মহিলা</option>
+            <option value="other">অন্যান্য</option>
+          </select>
+        </div>
+        <div class="form-error" id="reg-gender-err">লিঙ্গ বেছে নিন</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">পাসওয়ার্ড</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">🔒</span>
+          <input type="password" class="form-input" id="reg-pass" placeholder="কমপক্ষে ৬ অক্ষর">
+          <button class="pass-toggle" onclick="togglePass('reg-pass',this)">👁️</button>
+        </div>
+        <div class="form-error" id="reg-pass-err">কমপক্ষে ৬ অক্ষর দিন</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">পাসওয়ার্ড নিশ্চিত করুন</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">🔒</span>
+          <input type="password" class="form-input" id="reg-pass2" placeholder="পাসওয়ার্ড আবার দিন">
+          <button class="pass-toggle" onclick="togglePass('reg-pass2',this)">👁️</button>
+        </div>
+        <div class="form-error" id="reg-pass2-err">পাসওয়ার্ড মিলছে না</div>
+      </div>
+      <button class="btn btn-primary" onclick="doRegister()">অ্যাকাউন্ট তৈরি করুন</button>
+      <div class="terms-text">রেজিস্ট্রেশন করলে আমাদের <a href="#">শর্ত</a> ও <a href="#">গোপনীয়তা নীতি</a> মেনে নিচ্ছেন</div>
+    </div>
+    <div class="auth-switch">অ্যাকাউন্ট আছে? <a href="#" onclick="goToPage('login')">লগইন করুন</a></div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="page" id="home">
+  <div class="top-bar">
+    <div class="top-bar-logo">Social <span>Drop</span></div>
+    <div class="top-bar-icons">
+      <button class="icon-btn">🔔<span class="notif-dot"></span></button>
+      <button class="icon-btn">💬</button>
+    </div>
+  </div>
+  <div class="story-row">
+    <div class="story-item"><div class="story-avatar add-story">➕</div><div class="story-name">আপনার</div></div>
+    <div class="story-item"><div class="story-avatar" style="background:linear-gradient(135deg,#f093fb,#f5576c)">র</div><div class="story-name">রোহান</div></div>
+    <div class="story-item"><div class="story-avatar" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">স</div><div class="story-name">সাকিব</div></div>
+    <div class="story-item"><div class="story-avatar" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">ম</div><div class="story-name">মিম</div></div>
+  </div>
+  <div class="feed" id="feed-container"><div style="text-align:center;padding:40px;color:var(--text-light)">লোড হচ্ছে...</div></div>
+  <div class="bottom-nav">
+    <button class="nav-btn active" onclick="setNav(this,'home')">🏠<span>হোম</span></button>
+    <button class="nav-btn" onclick="setNav(this,'explore')">🔍<span>খোঁজ</span></button>
+    <button class="nav-btn" onclick="goToPage('create-post')"><div class="post-plus">＋</div></button>
+    <button class="nav-btn" onclick="setNav(this,'shop')">🛍️<span>শপ</span></button>
+    <button class="nav-btn" onclick="goToPage('profile')">👤<span>প্রোফাইল</span></button>
+  </div>
+</div>
+
+<!-- CREATE POST -->
+<div class="page" id="create-post">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goToPage('home')">← পিছে</button>
+    <div style="font-weight:700;font-size:16px">নতুন পোস্ট</div>
+    <button class="post-submit-btn" onclick="submitPost()">পোস্ট করুন</button>
+  </div>
+  <div class="auth-body">
+    <div class="warn-box">⚠️ ছবি পোস্ট করতে ভেরিফাই করুন। <a href="#" onclick="goToPage('verify')">এখনই ভেরিফাই করুন →</a></div>
+    <div class="auth-card">
+      <div class="post-author-row">
+        <div class="post-avatar" style="background:linear-gradient(135deg,#1A73E8,#0D3B8C)" id="post-av">আ</div>
+        <div><div style="font-weight:700;font-size:15px" id="post-author-name">আপনি</div></div>
+      </div>
+      <textarea class="post-textarea" id="post-text" placeholder="কী মনে আসছে? এখানে লিখুন..."></textarea>
+      <div class="img-upload-box" onclick="document.getElementById('img-input').click()">
+        <div id="img-preview-area"><div style="font-size:32px">🖼️</div><div style="font-size:13px;color:var(--text-light);margin-top:6px">ছবি যোগ করুন</div></div>
+        <input type="file" id="img-input" accept="image/*" style="display:none" onchange="previewImg(this)">
+      </div>
+      <div class="post-type-row">
+        <button class="type-btn active" onclick="setPostType(this)">🌍 সবাই দেখবে</button>
+        <button class="type-btn" onclick="setPostType(this)">👥 ফলোয়াররা</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="page" id="profile">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goToPage('home')">← পিছে</button>
+    <div style="font-weight:700;font-size:16px">প্রোফাইল</div>
+    <button class="icon-btn" onclick="doLogout()">🚪</button>
+  </div>
+  <div style="overflow-y:auto;padding-bottom:80px">
+    <div class="profile-header">
+      <div class="profile-big-avatar" id="prof-av">আ</div>
+      <div class="profile-name" id="profile-name-display">আপনি</div>
+      <div class="profile-username" id="profile-username-display">@username</div>
+      <div class="profile-bio">Social Drop Member</div>
+      <div class="profile-stats">
+        <div class="stat-item"><div class="stat-num" id="prof-posts">০</div><div class="stat-label">পোস্ট</div></div>
+        <div class="stat-item"><div class="stat-num" id="prof-followers">০</div><div class="stat-label">ফলোয়ার</div></div>
+        <div class="stat-item"><div class="stat-num" id="prof-following">০</div><div class="stat-label">ফলোয়িং</div></div>
+      </div>
+      <div class="profile-actions">
+        <button class="btn btn-primary" style="width:auto;padding:10px 24px;font-size:14px" onclick="goToPage('verify')">✅ ভেরিফাই করুন</button>
+        <button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px" onclick="goToPage('wallet')">💰 ওয়ালেট</button>
+      </div>
+    </div>
+    <div class="ad-banner-small"><div class="ad-label">বিজ্ঞাপন</div><div class="ad-content">🛍️ Social Drop Shop এ কেনাকাটা করুন!</div></div>
+    <div class="post-grid">
+      <div class="grid-item" style="background:#E8F0FE">🖼️</div>
+      <div class="grid-item" style="background:#FFF3E0">🎨</div>
+      <div class="grid-item" style="background:#E8F5E9">🏺</div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goToPage('home')">🏠<span>হোম</span></button>
+    <button class="nav-btn" onclick="setNav(this,'explore')">🔍<span>খোঁজ</span></button>
+    <button class="nav-btn" onclick="goToPage('create-post')"><div class="post-plus">＋</div></button>
+    <button class="nav-btn" onclick="setNav(this,'shop')">🛍️<span>শপ</span></button>
+    <button class="nav-btn active">👤<span>প্রোফাইল</span></button>
+  </div>
+</div>
+
+<!-- VERIFY -->
+<div class="page" id="verify">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goToPage('profile')">← পিছে</button>
+    <div style="font-weight:700;font-size:16px">অ্যাকাউন্ট ভেরিফাই</div>
+    <div></div>
+  </div>
+  <div class="auth-body">
+    <div class="info-box">🔵 ভেরিফাই করলে ছবি পোস্ট, ড্রপশিপিং ও ওয়ালেট পাবেন</div>
+    <div class="auth-card">
+      <h2>পরিচয় নথি বেছে নিন</h2>
+      <div class="verify-options">
+        <div class="verify-opt active" onclick="selectDoc(this,'nid')"><div style="font-size:24px">🪪</div><div style="font-weight:600;font-size:13px;margin-top:4px">NID কার্ড</div></div>
+        <div class="verify-opt" onclick="selectDoc(this,'birth')"><div style="font-size:24px">📋</div><div style="font-weight:600;font-size:13px;margin-top:4px">জন্ম নিবন্ধন</div></div>
+        <div class="verify-opt" onclick="selectDoc(this,'school')"><div style="font-size:24px">🎓</div><div style="font-weight:600;font-size:13px;margin-top:4px">স্কুল ID</div></div>
+      </div>
+    </div>
+    <div class="auth-card">
+      <h2>নথির ছবি দিন</h2>
+      <div class="upload-box" onclick="document.getElementById('doc-front').click()">
+        <div style="font-size:28px">📸</div>
+        <div style="font-size:13px;color:var(--text-light);margin-top:6px" id="front-label">সামনের দিকের ছবি</div>
+        <input type="file" id="doc-front" accept="image/*" style="display:none" onchange="setUploadLabel('doc-front','front-label')">
+      </div>
+      <div class="upload-box" style="margin-top:12px" onclick="document.getElementById('doc-back').click()">
+        <div style="font-size:28px">📸</div>
+        <div style="font-size:13px;color:var(--text-light);margin-top:6px" id="back-label">পেছনের দিকের ছবি</div>
+        <input type="file" id="doc-back" accept="image/*" style="display:none" onchange="setUploadLabel('doc-back','back-label')">
+      </div>
+    </div>
+    <div class="auth-card">
+      <h2>সেলফি দিন</h2>
+      <div class="upload-box" onclick="document.getElementById('selfie-input').click()">
+        <div style="font-size:28px">🤳</div>
+        <div style="font-size:13px;color:var(--text-light);margin-top:6px" id="selfie-label">আপনার মুখের স্পষ্ট ছবি</div>
+        <input type="file" id="selfie-input" accept="image/*" capture="user" style="display:none" onchange="setUploadLabel('selfie-input','selfie-label')">
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="submitVerify()">ভেরিফিকেশন পাঠান</button>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- WALLET -->
+<div class="page" id="wallet">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goToPage('profile')">← পিছে</button>
+    <div style="font-weight:700;font-size:16px">আমার ওয়ালেট</div>
+    <div></div>
+  </div>
+  <div class="auth-body">
+    <div class="wallet-card">
+      <div class="wallet-label">মোট ব্যালেন্স</div>
+      <div class="wallet-amount">৳ ০.০০</div>
+      <div class="wallet-sub">ইম্প্রেশন থেকে আয়: ৳০ | ড্রপশিপিং: ৳০</div>
+      <div class="wallet-actions">
+        <button class="wallet-btn wallet-btn-white" onclick="showToast('শীঘ্রই আসছে!')">💸 উইথড্র করুন</button>
+        <button class="wallet-btn wallet-btn-outline" onclick="showToast('শীঘ্রই আসছে!')">📊 হিস্ট্রি</button>
+      </div>
+    </div>
+    <div class="auth-card">
+      <h2>ইনকাম হিস্ট্রি</h2>
+      <div style="text-align:center;padding:20px;color:var(--text-light);font-size:14px">😊 এখনো কোনো আয় নেই<br>পোস্ট করুন ও আয় শুরু করুন!</div>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loading-text">লোড হচ্ছে...</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== FIREBASE INIT =====
+const firebaseConfig = {
+  apiKey: "AIzaSyBt_1FvDUNCeZ0BWUlVBQbCeuFjhlsp5Rs",
+  authDomain: "social-drop-eab2d.firebaseapp.com",
+  projectId: "social-drop-eab2d",
+  storageBucket: "social-drop-eab2d.firebasestorage.app",
+  messagingSenderId: "804992277265",
+  appId: "1:804992277265:web:b382d4359435e839ae0ab0"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const CLOUD_NAME = "dcwhojxfy";
+const UPLOAD_PRESET = "social_drop";
+
+let currentUser = null;
+let currentUserData = null;
+let selectedDocType = 'nid';
+
+// ===== AUTH STATE =====
+auth.onAuthStateChanged(async function(user) {
+  if (user) {
+    currentUser = user;
+    try {
+      const snap = await db.collection('users').doc(user.uid).get();
+      if (snap.exists) currentUserData = snap.data();
+    } catch(e) {}
+    goToPage('home');
+    renderFeed();
+    updateProfileUI();
+  } else {
+    currentUser = null;
+    currentUserData = null;
+    goToPage('login');
+  }
+});
+
+// ===== REGISTER =====
+function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const username = document.getElementById('reg-username').value.trim().toLowerCase();
+  const email = document.getElementById('reg-email').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const gender = document.getElementById('reg-gender').value;
+  const pass = document.getElementById('reg-pass').value;
+  const pass2 = document.getElementById('reg-pass2').value;
+
+  var valid = true;
+  clearErrors(['reg-name-err','reg-username-err','reg-email-err','reg-phone-err','reg-gender-err','reg-pass-err','reg-pass2-err']);
+  if (!name) { setError('reg-name-err','নাম দিন',true); valid=false; }
+  if (!username||!/^[a-z0-9_]+$/.test(username)) { setError('reg-username-err','শুধু a-z, 0-9, _ দিন',true); valid=false; }
+  if (!email||!/\S+@\S+\.\S+/.test(email)) { setError('reg-email-err','সঠিক ইমেইল দিন',true); valid=false; }
+  if (!phone||!/^01[3-9]\d{8}$/.test(phone)) { setError('reg-phone-err','সঠিক ফোন নম্বর দিন',true); valid=false; }
+  if (!gender) { setError('reg-gender-err','লিঙ্গ বেছে নিন',true); valid=false; }
+  if (!pass||pass.length<6) { setError('reg-pass-err','কমপক্ষে ৬ অক্ষর দিন',true); valid=false; }
+  if (pass!==pass2) { setError('reg-pass2-err','পাসওয়ার্ড মিলছে না',true); valid=false; }
+  if (!valid) return;
+
+  showLoading('অ্যাকাউন্ট তৈরি হচ্ছে...');
+  auth.createUserWithEmailAndPassword(email, pass)
+    .then(function(cred) {
+      return db.collection('users').doc(cred.user.uid).set({
+        uid: cred.user.uid, name: name, username: username,
+        email: email, phone: phone, gender: gender,
+        badge: 'none', verified: false,
+        followers: 0, following: 0, posts: 0,
+        wallet: 0, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    })
+    .then(function() {
+      hideLoading();
+      showToast('✅ রেজিস্ট্রেশন সফল!','success');
+    })
+    .catch(function(e) {
+      hideLoading();
+      if (e.code==='auth/email-already-in-use') showToast('এই ইমেইল আগেই আছে!','error');
+      else showToast('সমস্যা হয়েছে!','error');
+    });
+}
+
+// ===== LOGIN =====
+function doLogin() {
+  var email = document.getElementById('login-email').value.trim();
+  var pass = document.getElementById('login-pass').value;
+  var valid = true;
+  clearErrors(['login-email-err','login-pass-err']);
+  if (!email) { setError('login-email-err','ইমেইল দিন',true); valid=false; }
+  if (!pass) { setError('login-pass-err','পাসওয়ার্ড দিন',true); valid=false; }
+  if (!valid) return;
+
+  showLoading('লগইন হচ্ছে...');
+  auth.signInWithEmailAndPassword(email, pass)
+    .then(function() {
+      hideLoading();
+      showToast('✅ লগইন সফল!','success');
+    })
+    .catch(function(e) {
+      hideLoading();
+      showToast('ইমেইল বা পাসওয়ার্ড ভুল!','error');
+    });
+}
+
+// ===== LOGOUT =====
+function doLogout() {
+  auth.signOut().then(function() { showToast('লগআউট হয়েছে'); });
+}
+
+// ===== CLOUDINARY UPLOAD =====
+function uploadToCloudinary(file) {
+  var fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', UPLOAD_PRESET);
+  fd.append('folder', 'social_drop');
+  return fetch('https://api.cloudinary.com/v1_1/'+CLOUD_NAME+'/image/upload', { method:'POST', body:fd })
+    .then(function(r) { return r.json(); })
+    .then(function(d) { return d.secure_url; });
+}
+
+// ===== RENDER FEED =====
+function renderFeed() {
+  var container = document.getElementById('feed-container');
+  if (!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">পোস্ট লোড হচ্ছে...</div>';
+  db.collection('posts').orderBy('createdAt','desc').onSnapshot(function(snap) {
+    container.innerHTML = '';
+    if (snap.empty) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">😊 এখনো কোনো পোস্ট নেই<br>প্রথম পোস্ট করুন!</div>';
+      return;
+    }
+    var count = 0;
+    snap.forEach(function(d) {
+      var p = d.data();
+      if (count>0 && count%10===0) container.innerHTML += '<div class="ad-card"><div class="ad-tag">বিজ্ঞাপন</div><div class="ad-body"><div class="ad-icon">🛍️</div><div><div class="ad-title">Social Drop Shop</div><div class="ad-desc">সেরা দামে হ্যান্ডমেড পণ্য</div></div></div><button class="ad-cta">এখনই দেখুন →</button></div>';
+      var badge = p.badge==='blue'?'🔵':p.badge==='gold'?'🟡':'';
+      var letter = (p.name||'আ')[0];
+      container.innerHTML += '<div class="post-card"><div class="post-header"><div class="post-avatar" style="background:linear-gradient(135deg,#1A73E8,#0D3B8C)">'+letter+'</div><div class="post-user-info"><div class="post-user-name">'+p.name+' <span>'+badge+'</span></div><div class="post-time">@'+p.username+'</div></div><button class="post-more">⋯</button></div>'+(p.text?'<div class="post-text">'+p.text+'</div>':'')+(p.imgUrl?'<img class="post-img" src="'+p.imgUrl+'" loading="lazy">':'')+'<div class="post-actions"><button class="action-btn" onclick="toggleLike(this)"><span>🤍</span> '+(p.likes||0)+'</button><button class="action-btn"><span>💬</span> '+(p.comments||0)+'</button><button class="action-btn"><span>↗️</span> '+(p.shares||0)+'</button></div></div>';
+      count++;
+    });
+  }, function(e) {
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--error)">লোড হয়নি। ইন্টারনেট চেক করুন।</div>';
+  });
+}
+
+// ===== SUBMIT POST =====
+function submitPost() {
+  if (!currentUser) { showToast('আগে লগইন করুন','error'); return; }
+  var text = document.getElementById('post-text').value.trim();
+  var imgFile = document.getElementById('img-input').files[0];
+  if (!text && !imgFile) { showToast('কিছু লিখুন বা ছবি দিন!','error'); return; }
+
+  showLoading('পোস্ট হচ্ছে...');
+  var uploadPromise = (imgFile && currentUserData && currentUserData.verified)
+    ? uploadToCloudinary(imgFile)
+    : Promise.resolve('');
+
+  uploadPromise.then(function(imgUrl) {
+    return db.collection('posts').add({
+      uid: currentUser.uid,
+      name: (currentUserData&&currentUserData.name)||'ইউজার',
+      username: (currentUserData&&currentUserData.username)||'',
+      badge: (currentUserData&&currentUserData.badge)||'none',
+      text: text, imgUrl: imgUrl,
+      likes: 0, comments: 0, shares: 0,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }).then(function() {
+    hideLoading();
+    document.getElementById('post-text').value='';
+    document.getElementById('img-input').value='';
+    document.getElementById('img-preview-area').innerHTML='<div style="font-size:32px">🖼️</div><div style="font-size:13px;color:var(--text-light);margin-top:6px">ছবি যোগ করুন</div>';
+    showToast('✅ পোস্ট হয়েছে!','success');
+    setTimeout(function(){ goToPage('home'); renderFeed(); }, 800);
+  }).catch(function(e) {
+    hideLoading();
+    showToast('পোস্ট হয়নি!','error');
+  });
+}
+
+// ===== SUBMIT VERIFY =====
+function submitVerify() {
+  if (!currentUser) return;
+  var front = document.getElementById('doc-front').files[0];
+  var back = document.getElementById('doc-back').files[0];
+  var selfie = document.getElementById('selfie-input').files[0];
+  if (!front||!back||!selfie) { showToast('সব ছবি দিন!','error'); return; }
+
+  showLoading('আপলোড হচ্ছে...');
+  Promise.all([uploadToCloudinary(front), uploadToCloudinary(back), uploadToCloudinary(selfie)])
+    .then(function(urls) {
+      return db.collection('verifications').add({
+        uid: currentUser.uid,
+        name: currentUserData&&currentUserData.name,
+        docType: selectedDocType,
+        frontUrl: urls[0], backUrl: urls[1], selfieUrl: urls[2],
+        status: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    })
+    .then(function() {
+      hideLoading();
+      showToast('✅ ভেরিফিকেশন রিকোয়েস্ট পাঠানো হয়েছে!','success');
+      setTimeout(function(){ goToPage('profile'); }, 1500);
+    })
+    .catch(function(e) {
+      hideLoading();
+      showToast('সমস্যা হয়েছে!','error');
+    });
+}
+
+// ===== UPDATE PROFILE UI =====
+function updateProfileUI() {
+  if (!currentUserData) return;
+  var name = currentUserData.name||'ইউজার';
+  var username = currentUserData.username||'';
+  var badge = currentUserData.badge==='blue'?'🔵':currentUserData.badge==='gold'?'🟡':'';
+  var letter = name[0]||'আ';
+  var el = document.getElementById('profile-name-display');
+  if (el) el.innerHTML = name+' <span>'+badge+'</span>';
+  var un = document.getElementById('profile-username-display');
+  if (un) un.textContent = '@'+username;
+  var av = document.getElementById('prof-av');
+  if (av) av.textContent = letter;
+  var pav = document.getElementById('post-av');
+  if (pav) pav.textContent = letter;
+  var pan = document.getElementById('post-author-name');
+  if (pan) pan.textContent = name;
+}
+
+// ===== HELPERS =====
+function goToPage(id) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  var el = document.getElementById(id);
+  if (el) { el.classList.add('active'); window.scrollTo(0,0); }
+}
+
+function showLoading(txt) {
+  var o = document.getElementById('loading-overlay');
+  o.style.display='flex';
+  document.getElementById('loading-text').textContent = txt||'লোড হচ্ছে...';
+}
+
+function hideLoading() {
+  document.getElementById('loading-overlay').style.display='none';
+}
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast '+(type==='success'?'success':type==='error'?'error':'');
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+function setError(id, msg, show) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  if (show) { el.textContent=msg; el.classList.add('show'); }
+  else el.classList.remove('show');
+}
+
+function clearErrors(ids) { ids.forEach(function(id){ setError(id,'',false); }); }
+
+function togglePass(inputId, btn) {
+  var input = document.getElementById(inputId);
+  input.type = input.type==='password'?'text':'password';
+  btn.textContent = input.type==='password'?'👁️':'🙈';
+}
+
+function setNav(btn, page) {
+  if (page==='home') { goToPage('home'); renderFeed(); }
+  else if (page==='profile') goToPage('profile');
+  else showToast('শীঘ্রই আসছে! 🚀');
+}
+
+function setPostType(btn) {
+  document.querySelectorAll('.type-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+function previewImg(input) {
+  if (input.files&&input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('img-preview-area').innerHTML = '<img src="'+e.target.result+'" style="width:100%;border-radius:8px;max-height:200px;object-fit:cover">';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function selectDoc(el, type) {
+  document.querySelectorAll('.verify-opt').forEach(function(o){ o.classList.remove('active'); });
+  el.classList.add('active');
+  selectedDocType = type;
+}
+
+function setUploadLabel(inputId, labelId) {
+  var input = document.getElementById(inputId);
+  if (input.files[0]) document.getElementById(labelId).textContent = '✅ '+input.files[0].name;
+}
+
+function toggleLike(btn) {
+  btn.classList.toggle('liked');
+  btn.querySelector('span').textContent = btn.classList.contains('liked')?'❤️':'🤍';
+}
+
+// Splash timeout
+setTimeout(function() {
+  if (document.getElementById('splash').classList.contains('active')) goToPage('login');
+}, 2800);
+</script>
+</body>
+</html>
