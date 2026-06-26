@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta name="monetag" content="4dd12afa8b870e9d80453f21f3e1d74a">
+   <meta name="monetag" content="4dd12afa8b870e9d80453f21f3e1d74a">
   <script src="https://quge5.com/88/tag.min.js" data-zone="253426" async data-cfasync="false"></script>
 <meta charset="UTF-8">
 <meta name="monetag" content="b8bbd485afffc16d3917cac77d322ac7">
@@ -177,8 +177,8 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 .income-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
 .loading-ov{position:fixed;inset:0;background:rgba(255,255,255,0.92);display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:11px}
 .spinner{width:38px;height:38px;border:3px solid var(--blue-light);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
-.toast{position:fixed;bottom:85px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--text);color:#fff;padding:12px 20px;border-radius:14px;font-size:14px;font-weight:500;z-index:9999;transition:transform .3s;white-space:normal;max-width:85vw;width:max-content;text-align:center;line-height:1.5;box-shadow:0 4px 16px rgba(0,0,0,0.25)}
-.toast.show{transform:translateX(-50%) translateY(0)}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(0);background:var(--text);color:#fff;padding:12px 20px;border-radius:14px;font-size:14px;font-weight:500;z-index:9999;white-space:normal;max-width:85vw;width:max-content;text-align:center;line-height:1.5;box-shadow:0 4px 16px rgba(0,0,0,0.25);opacity:0;pointer-events:none;transition:opacity .3s ease}
+.toast.show{opacity:1;pointer-events:auto}
 .toast.ok{background:var(--success)}.toast.er{background:var(--error)}
 </style>
 </head>
@@ -727,7 +727,13 @@ let CU=null,CUD=null,selDocType="nid",selPay="cod",curProd=null,curPostId=null,c
 let likedPosts={},viewedPosts={};
 
 let _skipPush=false;
+const PUBLIC_PAGES=["splash","login","register"];
 function gp(id,skipHistory){
+  // Block access to protected pages if not logged in
+  if(!PUBLIC_PAGES.includes(id)&&!CU){
+    gp("login");
+    return;
+  }
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   const el=document.getElementById(id);
   if(el){el.classList.add("active");window.scrollTo(0,0);}
@@ -764,7 +770,18 @@ if(!history.state)history.replaceState({page:"splash"},"",location.pathname);
 
 function showL(t){const o=document.getElementById("loading-ov");if(o)o.style.display="flex";const tx=document.getElementById("loading-txt");if(tx)tx.textContent=t||"লোড হচ্ছে...";}
 function hideL(){const o=document.getElementById("loading-ov");if(o)o.style.display="none";}
-function toast(m,t){const el=document.getElementById("toast");el.textContent=m;el.className="toast "+(t==="ok"?"ok":t==="er"?"er":"");el.classList.add("show");setTimeout(()=>el.classList.remove("show"),3000);}
+let _toastTimer=null;
+function toast(m,t){
+  const el=document.getElementById("toast");
+  if(!el)return;
+  if(_toastTimer)clearTimeout(_toastTimer);
+  el.textContent=m;
+  el.className="toast show "+(t==="ok"?"ok":t==="er"?"er":"");
+  _toastTimer=setTimeout(()=>{
+    el.classList.remove("show");
+    _toastTimer=null;
+  },3000);
+}
 function se(id,m,s){const el=document.getElementById(id);if(!el)return;if(s){el.textContent=m;el.classList.add("show");}else el.classList.remove("show");}
 function ce(ids){ids.forEach(id=>se(id,"",false));}
 function toggleEye(iid,btn){const i=document.getElementById(iid);i.type=i.type==="password"?"text":"password";btn.textContent=i.type==="password"?"👁️":"🙈";}
@@ -808,8 +825,21 @@ let authResponded=false;
 auth.onAuthStateChanged(async user=>{
   authResponded=true;
   if(user){
-    CU=user;
-    try{const s=await db.collection("users").doc(user.uid).get();if(s.exists)CUD=s.data();}catch(e){}
+    try{
+      const s=await db.collection("users").doc(user.uid).get();
+      if(!s.exists){
+        // Ghost/anonymous account - no user doc found, sign out
+        await auth.signOut();
+        CU=null;CUD=null;
+        gp("login");
+        return;
+      }
+      CU=user;
+      CUD=s.data();
+    }catch(e){
+      // Network error - still let in if we have cached data
+      CU=user;
+    }
     loadUserInteractions();
     gp("home");updateProfileUI();checkAdmin();
     db.collection("users").doc(user.uid).onSnapshot(d=>{if(d.exists){CUD=d.data();updateProfileUI();}});
