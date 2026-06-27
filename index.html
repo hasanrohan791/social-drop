@@ -425,7 +425,11 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="page" id="product-detail">
 <div class="topbar"><button class="back-btn" onclick="gp('shop')">← পিছে</button><div style="font-weight:700;font-size:15px">পণ্যের বিবরণ</div><div></div></div>
 <div style="overflow-y:auto;padding-bottom:80px">
-<div id="detail-img" style="width:100%;height:270px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:70px">🛍️</div>
+<div style="position:relative;width:100%;background:var(--blue-light)">
+<div id="detail-img-slider" style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch"></div>
+<div id="detail-img-dots" style="display:flex;justify-content:center;gap:6px;padding:8px 0;position:absolute;bottom:8px;left:0;right:0"></div>
+<button id="dl-btn" onclick="downloadCurProdImg()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.55);color:#fff;border:none;border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600;display:none">⬇️ ডাউনলোড</button>
+</div>
 <div style="padding:15px">
 <div style="font-size:21px;font-weight:800;color:var(--text)" id="detail-name">পণ্যের নাম</div>
 <div style="font-size:16px;font-weight:700;color:var(--blue);margin-top:5px" id="detail-price">৳ ০</div>
@@ -666,6 +670,14 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="topbar"><button class="back-btn" onclick="gp('feature-hub')">← পিছে</button><div style="font-weight:700;font-size:15px">📦 সাবস্ক্রিপশন অ্যাপ</div><div></div></div>
 <div class="auth-body"><div class="info-box" style="text-align:center;padding:30px"><div style="font-size:40px">📦</div><div style="font-weight:700;font-size:16px;margin-top:10px">সাবস্ক্রিপশন সার্ভিস</div><div style="font-size:13px;color:var(--gray);margin-top:8px">শীঘ্রই আসছে!</div></div></div></div>
 
+<!-- ADMIN BLOCKED IMAGES -->
+<div class="page" id="admin-blocked">
+<div class="topbar"><button class="back-btn" onclick="gp('admin')">← পিছে</button><div style="font-weight:700;font-size:15px">🚫 ব্লক করা ছবি</div><div></div></div>
+<div class="auth-body">
+<div class="info-box" style="margin-bottom:12px">⚠️ AI এই ছবিগুলো সন্দেহজনক মনে করেছে। আপনি চেক করে Approve বা Delete করুন।</div>
+<div id="blocked-list"><div style="text-align:center;padding:30px;color:var(--gray)">লোড হচ্ছে...</div></div>
+</div></div>
+
 <!-- HUB DROPS PAGE -->
 <div class="page" id="hub-drops">
 <div class="topbar"><button class="back-btn" onclick="gp('home')">← পিছে</button><div style="font-weight:700;font-size:15px">💧 আমার ড্রপস</div><div></div></div>
@@ -724,6 +736,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="a-menu" onclick="gp('admin-withdrawals')"><span>💸</span><div style="flex:1"><div style="font-weight:600">উইথড্র রিকোয়েস্ট</div><div style="font-size:12px;color:var(--gray)">পেমেন্ট অনুমোদন করুন</div></div><span style="color:var(--gray)">›</span></div>
 <div class="a-menu" onclick="gp('admin-ads')"><span>📢</span><div style="flex:1"><div style="font-weight:600">Ad ম্যানেজমেন্ট</div><div style="font-size:12px;color:var(--gray)">বিজ্ঞাপন নিয়ন্ত্রণ</div></div><span style="color:var(--gray)">›</span></div>
 <div class="a-menu" onclick="gp('admin-categories')"><span>📂</span><div style="flex:1"><div style="font-weight:600">ক্যাটাগরি ম্যানেজমেন্ট</div><div style="font-size:12px;color:var(--gray)">ক্যাটাগরি যোগ ও মুছুন</div></div><span style="color:var(--gray)">›</span></div>
+<div class="a-menu" onclick="gp('admin-blocked')"><span>🚫</span><div style="flex:1"><div style="font-weight:600">ব্লক করা ছবি</div><div style="font-size:12px;color:var(--gray)">AI আটকানো ছবি রিভিউ করুন</div></div><span class="ndot" id="blocked-dot" style="background:#EF4444;display:none"></span><span style="color:var(--gray)">›</span></div>
 </div></div></div>
 
 <!-- ADMIN SUB PAGES -->
@@ -742,8 +755,22 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="fg"><label class="fl">ক্যাটাগরি</label><div class="fi-wrap"><span class="fi-icon">📂</span><select class="fsel" id="pc"><option value="helmet">হেলমেট</option><option value="gypsum">গিপসাম</option><option value="candle">মোমবাতি</option><option value="decor">ডেকোর</option></select></div></div>
 <div class="fg"><label class="fl">স্টক</label><div class="fi-wrap"><span class="fi-icon">📦</span><input type="number" class="fi" id="pst" placeholder="০"></div></div>
 <div class="fg"><label class="fl">বিবরণ</label><textarea class="post-ta" id="pd" placeholder="পণ্যের বিস্তারিত..." style="min-height:70px"></textarea></div>
-<div class="upload-box" onclick="pickGallery('pi')"><div style="font-size:24px">📸</div><div style="font-size:12px;color:var(--gray);margin-top:5px" id="pi-lbl">পণ্যের ছবি (গ্যালারি)</div><input type="file" id="pi" accept="image/*" onchange="setLbl('pi','pi-lbl')"></div>
-<button class="btn btn-p" style="margin-top:14px" onclick="addProduct()">পণ্য যোগ করুন</button>
+<div class="fg"><label class="fl">পণ্যের ছবি (সর্বোচ্চ ৩টা)</label></div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
+<div onclick="pickGallery('pi1')" style="aspect-ratio:1;background:var(--bg);border:2px dashed var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" id="pi1-box">
+<div style="font-size:22px">📸</div><div style="font-size:10px;color:var(--gray);margin-top:4px">ছবি ১</div>
+<input type="file" id="pi1" accept="image/*" style="display:none" onchange="previewProdImg(this,'pi1-box','1')">
+</div>
+<div onclick="pickGallery('pi2')" style="aspect-ratio:1;background:var(--bg);border:2px dashed var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" id="pi2-box">
+<div style="font-size:22px">📸</div><div style="font-size:10px;color:var(--gray);margin-top:4px">ছবি ২</div>
+<input type="file" id="pi2" accept="image/*" style="display:none" onchange="previewProdImg(this,'pi2-box','2')">
+</div>
+<div onclick="pickGallery('pi3')" style="aspect-ratio:1;background:var(--bg);border:2px dashed var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" id="pi3-box">
+<div style="font-size:22px">📸</div><div style="font-size:10px;color:var(--gray);margin-top:4px">ছবি ৩</div>
+<input type="file" id="pi3" accept="image/*" style="display:none" onchange="previewProdImg(this,'pi3-box','3')">
+</div>
+</div>
+<button class="btn btn-p" style="margin-top:4px" onclick="addProduct()">পণ্য যোগ করুন</button>
 </div></div></div>
 
 <!-- PRODUCT EDIT -->
@@ -758,7 +785,21 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="fg"><label class="fl">ক্যাটাগরি</label><div class="fi-wrap"><span class="fi-icon">📂</span><select class="fsel" id="ep-cat"><option value="helmet">হেলমেট</option><option value="gypsum">গিপসাম</option><option value="candle">মোমবাতি</option><option value="decor">ডেকোর</option></select></div></div>
 <div class="fg"><label class="fl">স্টক</label><div class="fi-wrap"><span class="fi-icon">📦</span><input type="number" class="fi" id="ep-stock" placeholder="০"></div></div>
 <div class="fg"><label class="fl">বিবরণ</label><textarea class="post-ta" id="ep-desc" placeholder="পণ্যের বিস্তারিত..." style="min-height:70px"></textarea></div>
-<div class="upload-box" onclick="pickGallery('ep-img')"><div style="font-size:24px">📸</div><div style="font-size:12px;color:var(--gray);margin-top:5px" id="ep-img-lbl">নতুন ছবি (না দিলে আগেরটা থাকবে)</div><input type="file" id="ep-img" accept="image/*" onchange="setLbl('ep-img','ep-img-lbl')"></div>
+<div class="fg"><label class="fl">পণ্যের ছবি (সর্বোচ্চ ৩টা — না দিলে আগেরটা থাকবে)</label></div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
+<div onclick="pickGallery('epi1')" style="aspect-ratio:1;background:var(--bg);border:2px dashed var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" id="epi1-box">
+<div style="font-size:22px">📸</div><div style="font-size:10px;color:var(--gray);margin-top:4px">ছবি ১</div>
+<input type="file" id="epi1" accept="image/*" style="display:none" onchange="previewProdImg(this,'epi1-box','e1')">
+</div>
+<div onclick="pickGallery('epi2')" style="aspect-ratio:1;background:var(--bg);border:2px dashed var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" id="epi2-box">
+<div style="font-size:22px">📸</div><div style="font-size:10px;color:var(--gray);margin-top:4px">ছবি ২</div>
+<input type="file" id="epi2" accept="image/*" style="display:none" onchange="previewProdImg(this,'epi2-box','e2')">
+</div>
+<div onclick="pickGallery('epi3')" style="aspect-ratio:1;background:var(--bg);border:2px dashed var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" id="epi3-box">
+<div style="font-size:22px">📸</div><div style="font-size:10px;color:var(--gray);margin-top:4px">ছবি ৩</div>
+<input type="file" id="epi3" accept="image/*" style="display:none" onchange="previewProdImg(this,'epi3-box','e3')">
+</div>
+</div>
 </div></div></div>
 <div class="page" id="admin-orders"><div class="topbar"><button class="back-btn" onclick="gp('admin')">← পিছে</button><div style="font-weight:700;font-size:15px">📦 অর্ডার</div><div></div></div><div style="overflow-y:auto;padding:14px" id="a-ord-list"></div></div>
 <div class="page" id="admin-withdrawals"><div class="topbar"><button class="back-btn" onclick="gp('admin')">← পিছে</button><div style="font-weight:700;font-size:15px">💸 উইথড্র</div><div></div></div><div style="overflow-y:auto;padding:14px" id="wd-reqs"></div></div>
@@ -797,11 +838,18 @@ if(typeof firebase==="undefined"){
   document.body.innerHTML='<div style="padding:30px;text-align:center;font-family:sans-serif"><h2>⚠️ লোড হয়নি</h2><p style="margin-top:8px;color:#666">ইন্টারনেট চালু আছে কিনা দেখুন এবং পেজ রিলোড করুন।</p><button onclick="location.reload()" style="margin-top:14px;padding:10px 22px;background:#3B82F6;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer">🔄 রিলোড</button></div>';
   throw new Error("Firebase CDN not loaded");
 }
+window.onerror=function(msg,src,line,col,err){
+  console.error("GLOBAL ERROR:",msg,"Line:",line,"Col:",col);
+  return false;
+};
+window.addEventListener("unhandledrejection",function(e){
+  console.error("PROMISE ERROR:",e.reason);
+});
 firebase.initializeApp({apiKey:"AIzaSyBt_1FvDUNCeZ0BWUlVBQbCeuFjhlsp5Rs",authDomain:"social-drop-eab2d.firebaseapp.com",projectId:"social-drop-eab2d",storageBucket:"social-drop-eab2d.firebasestorage.app",messagingSenderId:"804992277265",appId:"1:804992277265:web:b382d4359435e839ae0ab0"});
 const auth=firebase.auth(),db=firebase.firestore();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
 try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{});}catch(e){}
-const CLOUD="dcwhojxfy",PRESET="social_drop";
+// (CLOUD/PRESET defined in upload system above)
 let CU=null,CUD=null,selDocType="nid",selPay="cod",curProd=null,curPostId=null,chatUID=null,chatUnsub=null;
 let likedPosts={},viewedPosts={};
 
@@ -832,6 +880,7 @@ function gp(id,skipHistory){
   if(id==="hub-refer")loadReferPage();
   if(id==="hub-drops")loadDropsPage();
   if(id==="admin-withdrawals")loadWdReqs();
+  if(id==="admin-blocked")loadBlockedImages();
   if(id==="profile")loadMyPosts();
   if(id==="explore")loadExplore();
   if(id==="chat-list")loadChatList();
@@ -893,14 +942,165 @@ function showPrompt(msg,onSubmit){
   };
 }
 
-async function uploadImg(file){
-  const fd=new FormData();
-  fd.append("file",file);fd.append("upload_preset",PRESET);fd.append("folder","social_drop");
-  const r=await fetch("https://api.cloudinary.com/v1_1/"+CLOUD+"/image/upload",{method:"POST",body:fd});
-  const d=await r.json();
-  if(d.error)throw new Error(d.error.message);
+// ===== IMAGE UPLOAD SYSTEM =====
+// ImgBB API
+const IMGBB_KEY = "3be582772f077bece210c86fd42bdc19";
+const IMGBB_ALBUMS = {
+  profile:  "0Q1Ndy",
+  product:  "5BWWF7",
+  post:     "WGgXJG"
+};
+// Sightengine API
+const SE_USER   = "573922418";
+const SE_SECRET = "rJxovq2h6UbHNenhETHkakJSL2fM7XGn";
+// Cloudinary (verification only)
+const CLOUD = "dcwhojxfy", PRESET = "social_drop";
+
+// Resize image before upload (canvas)
+function resizeImage(file, maxWidth=1200, quality=0.85){
+  return new Promise((resolve)=>{
+    const img=new Image();
+    const url=URL.createObjectURL(file);
+    img.onload=()=>{
+      const scale=Math.min(1, maxWidth/img.width);
+      const w=Math.round(img.width*scale);
+      const h=Math.round(img.height*scale);
+      const canvas=document.createElement("canvas");
+      canvas.width=w; canvas.height=h;
+      canvas.getContext("2d").drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(blob=>resolve(blob),"image/jpeg",quality);
+    };
+    img.onerror=()=>resolve(file);
+    img.src=url;
+  });
+}
+
+// Upload to ImgBB with album
+async function uploadToImgBB(file, albumType="post"){
+  const blob = await resizeImage(file);
+  const fd = new FormData();
+  fd.append("image", blob, "image.jpg");
+  fd.append("key", IMGBB_KEY);
+  if(IMGBB_ALBUMS[albumType]) fd.append("album", IMGBB_ALBUMS[albumType]);
+  const r = await fetch("https://api.imgbb.com/1/upload", {method:"POST", body:fd});
+  const d = await r.json();
+  if(!d.success) throw new Error(d.error?.message||"ImgBB upload failed");
+  return {
+    url: d.data.url,
+    deleteUrl: d.data.delete_url,
+    thumbUrl: d.data.thumb?.url||d.data.url
+  };
+}
+
+// Delete from ImgBB using delete_url
+async function deleteFromImgBB(deleteUrl){
+  if(!deleteUrl) return;
+  try{
+    await fetch(deleteUrl, {method:"GET", mode:"no-cors"});
+  }catch(e){}
+}
+
+// Upload to Cloudinary (verification only)
+async function uploadToCloudinary(file, folder="verification"){
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", PRESET);
+  fd.append("folder", "social_drop/"+folder);
+  const r = await fetch("https://api.cloudinary.com/v1_1/"+CLOUD+"/image/upload",{method:"POST",body:fd});
+  const d = await r.json();
+  if(d.error) throw new Error(d.error.message);
   return d.secure_url;
 }
+
+// Scan image with Sightengine
+async function scanImage(file){
+  try{
+    const fd = new FormData();
+    fd.append("media", file, "image.jpg");
+    fd.append("models", "nudity-2.0,weapon,alcohol,recreational_drug,offensive");
+    fd.append("api_user", SE_USER);
+    fd.append("api_secret", SE_SECRET);
+    const r = await fetch("https://api.sightengine.com/1.0/check.json",{method:"POST",body:fd});
+    const d = await r.json();
+    if(d.status!=="success") return {safe:true};
+    const nudity = d.nudity?.sexual_activity||0;
+    const weapon = d.weapon||0;
+    const drug   = d.recreational_drug?.prob||0;
+    const isUnsafe = nudity>0.5 || weapon>0.7 || drug>0.7;
+    return {safe:!isUnsafe, scores:{nudity,weapon,drug}, raw:d};
+  }catch(e){
+    return {safe:true}; // fail open
+  }
+}
+
+// Main upload: post images go through Sightengine first
+async function uploadPostImg(file){
+  showL("ছবি যাচাই হচ্ছে...");
+  const scan = await scanImage(file);
+  if(!scan.safe){
+    // Upload to Cloudinary temp for admin review
+    const blob = await resizeImage(file, 800, 0.7);
+    const tempUrl = await uploadToCloudinary(new File([blob],"blocked.jpg"), "blocked_posts");
+    // Save to Firestore for admin review
+    await db.collection("blocked_images").add({
+      uid: CU.uid,
+      username: CUD&&CUD.username||"",
+      tempUrl,
+      scores: scan.scores,
+      status: "pending",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    // Notify admin
+    db.collection("admin_notifications").add({
+      type:"blocked_image", uid:CU.uid,
+      username:CUD&&CUD.username||"",
+      tempUrl,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    throw new Error("BLOCKED");
+  }
+  // Safe — upload to ImgBB posts album
+  showL("ছবি আপলোড হচ্ছে...");
+  return await uploadToImgBB(file, "post");
+}
+
+// Profile pic upload → ImgBB profile album
+async function uploadProfileImg(input){
+  if(!input.files[0]||!CU)return;
+  showL("প্রোফাইল ছবি আপলোড হচ্ছে...");
+  try{
+    const {url, deleteUrl} = await uploadToImgBB(input.files[0], "profile");
+    // Delete old profile pic from ImgBB
+    const oldDeleteUrl = CUD&&CUD.profileImgDeleteUrl;
+    if(oldDeleteUrl) deleteFromImgBB(oldDeleteUrl);
+    // Update user doc
+    await db.collection("users").doc(CU.uid).update({profileImg:url, profileImgDeleteUrl:deleteUrl});
+    // Batch update all posts by this user
+    showL("সব জায়গায় আপডেট হচ্ছে...");
+    const postSnap = await db.collection("posts").where("uid","==",CU.uid).get();
+    if(!postSnap.empty){
+      const batch = db.batch();
+      postSnap.forEach(d=>batch.update(d.ref,{profileImg:url}));
+      await batch.commit();
+    }
+    // Update comments
+    db.collectionGroup("comments").where("uid","==",CU.uid).get()
+      .then(s=>{
+        if(!s.empty){const b=db.batch();s.forEach(d=>b.update(d.ref,{profileImg:url}));b.commit().catch(()=>{});}
+      }).catch(()=>{});
+    hideL();
+    toast("✅ প্রোফাইল ছবি আপডেট হয়েছে!","ok");
+  }catch(e){hideL();toast("আপলোড হয়নি!","er");}
+}
+
+// Generic uploadImg (kept for backward compat — routes by context)
+async function uploadImg(file, type="post"){
+  if(type==="verification") return await uploadToCloudinary(file);
+  const result = await uploadToImgBB(file, type);
+  return result.url;
+}
+
 
 let authResponded=false;
 auth.onAuthStateChanged(async user=>{
@@ -922,7 +1122,7 @@ auth.onAuthStateChanged(async user=>{
       CU=user;
     }
     loadUserInteractions();
-    gp("home");updateProfileUI();checkAdmin();
+    gp("home");updateProfileUI();checkAdmin();checkBlockedDot();
     db.collection("users").doc(user.uid).onSnapshot(d=>{if(d.exists){CUD=d.data();updateProfileUI();}});
     loadNotifDot();
     // Auto-fix on login: update ALL posts missing profileImg
@@ -1203,14 +1403,18 @@ function openPostMenu(postId,authorUid){
   delBtn.onclick=()=>{
     ov.remove();
     showConfirm(isAdmin&&!isOwner?"⚠️ Admin: এই পোস্ট মুছে ফেলবেন?":"এই পোস্ট মুছে ফেলবেন?",()=>{
-      db.collection("posts").doc(postId).delete().then(()=>{
-        toast("পোস্ট মুছে ফেলা হয়েছে","ok");
-        // Update post count safely
-        db.collection("users").doc(authorUid).get().then(ud=>{
-          const cur=ud.exists?(ud.data().posts||0):0;
-          if(cur>0)db.collection("users").doc(authorUid).update({posts:firebase.firestore.FieldValue.increment(-1)}).catch(()=>{});
-        }).catch(()=>{});
-        if(isAdmin&&!isOwner)sendNotif(authorUid,"⚠️ পোস্ট মুছে ফেলা হয়েছে","Admin আপনার একটি পোস্ট নীতিমালা ভঙ্গের কারণে মুছে দিয়েছে");
+      db.collection("posts").doc(postId).get().then(pd=>{
+        const pdata=pd.exists?pd.data():{};
+        return db.collection("posts").doc(postId).delete().then(()=>{
+          // Delete from ImgBB
+          if(pdata.imgDeleteUrl) deleteFromImgBB(pdata.imgDeleteUrl);
+          toast("পোস্ট মুছে ফেলা হয়েছে","ok");
+          db.collection("users").doc(authorUid).get().then(ud=>{
+            const cur=ud.exists?(ud.data().posts||0):0;
+            if(cur>0)db.collection("users").doc(authorUid).update({posts:firebase.firestore.FieldValue.increment(-1)}).catch(()=>{});
+          }).catch(()=>{});
+          if(isAdmin&&!isOwner)sendNotif(authorUid,"⚠️ পোস্ট মুছে ফেলা হয়েছে","Admin আপনার একটি পোস্ট নীতিমালা ভঙ্গের কারণে মুছে দিয়েছে");
+        });
       });
     });
   };
@@ -1353,36 +1557,44 @@ function sharePost(postId){
 
 async function submitPost(){
   if(!CU){toast("আগে লগইন করুন","er");return;}
+  if(!CUD.verified){toast("পোস্ট করতে আগে ভেরিফাই করুন!","er");return;}
   const text=document.getElementById("post-text").value.trim();
   const imgFile=document.getElementById("post-img-input").files[0];
   if(!text&&!imgFile){toast("কিছু লিখুন বা ছবি দিন!","er");return;}
-  if(imgFile&&!(CUD&&CUD.verified)){toast("ছবি পোস্ট করতে ভেরিফাই করুন!","er");gp("verify");return;}
-  // Daily image post limit: regular verified users = 1/day, gold (official) users = unlimited
-  if(imgFile&&CUD&&CUD.badge!=="gold"){
-    showL("চেক করা হচ্ছে...");
-    const todayStart=new Date();todayStart.setHours(0,0,0,0);
-    try{
-      const snap=await db.collection("posts").where("uid","==",CU.uid).where("imgUrl","!=","").get();
-      const todayImagePosts=snap.docs.filter(d=>{
-        const ts=d.data().createdAt;
-        return ts&&ts.toDate&&ts.toDate()>=todayStart;
-      });
-      if(todayImagePosts.length>=1){
-        hideL();toast("আজকের জন্য আপনার ছবি পোস্টের সীমা শেষ! আগামীকাল আবার চেষ্টা করুন।","er");return;
-      }
-    }catch(e){/* if query fails (e.g. missing index), allow post rather than block */}
-  }
   showL("পোস্ট হচ্ছে...");
   try{
-    let imgUrl="";
-    if(imgFile)imgUrl=await uploadImg(imgFile);
-    await db.collection("posts").add({uid:CU.uid,name:(CUD&&CUD.name)||"ইউজার",username:(CUD&&CUD.username)||"",badge:(CUD&&CUD.badge)||"none",profileImg:(CUD&&CUD.profileImg)||"",text,imgUrl,likes:0,comments:0,shares:0,impressions:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    let imgUrl="", imgDeleteUrl="";
+    if(imgFile){
+      try{
+        const result = await uploadPostImg(imgFile);
+        imgUrl = result.url;
+        imgDeleteUrl = result.deleteUrl;
+      }catch(e){
+        if(e.message==="BLOCKED"){
+          hideL();
+          toast("⚠️ ছবিটি নিরাপত্তা যাচাইয়ে আটকে গেছে। Admin পর্যালোচনা করবে।","er");
+          return;
+        }
+        throw e;
+      }
+    }
+    await db.collection("posts").add({
+      uid:CU.uid,
+      name:(CUD&&CUD.name)||"ইউজার",
+      username:(CUD&&CUD.username)||"",
+      badge:(CUD&&CUD.badge)||"none",
+      profileImg:(CUD&&CUD.profileImg)||"",
+      text, imgUrl, imgDeleteUrl,
+      likes:0, comments:0, shares:0, impressions:0,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
     await db.collection("users").doc(CU.uid).update({posts:firebase.firestore.FieldValue.increment(1)});
     hideL();
+    toast("✅ পোস্ট হয়েছে!","ok");
     document.getElementById("post-text").value="";
     document.getElementById("post-img-input").value="";
-    document.getElementById("post-preview").innerHTML="<div style=\"font-size:28px\">🖼️</div><div style=\"font-size:12px;color:var(--gray);margin-top:5px\">গ্যালারি থেকে ছবি যোগ করুন</div>";
-    toast("✅ পোস্ট হয়েছে!","ok");setTimeout(()=>gp("home"),800);
+    document.getElementById("post-preview").innerHTML="";
+    gp("home");
   }catch(e){hideL();toast("পোস্ট হয়নি!","er");}
 }
 
@@ -1665,9 +1877,9 @@ async function submitVerify(){
   if(!selfie){toast("সেলফি দিন!","er");return;}
   showL("আপলোড হচ্ছে...");
   try{
-    const frontUrl=await uploadImg(front);
-    const backUrl=needBack?(await uploadImg(back)):"";
-    const selfieUrl=await uploadImg(selfie);
+    const frontUrl=await uploadToCloudinary(front,"verification");
+    const backUrl=needBack?(await uploadToCloudinary(back,"verification")):"";
+    const selfieUrl=await uploadToCloudinary(selfie,"verification");
     await db.collection("verifications").add({uid:CU.uid,name:CUD&&CUD.name,docType:selDocType,frontUrl,backUrl,selfieUrl,status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});
     hideL();toast("✅ ভেরিফিকেশন রিকোয়েস্ট পাঠানো হয়েছে!","ok");setTimeout(()=>gp("profile"),1500);
   }catch(e){hideL();toast("সমস্যা হয়েছে!","er");}
@@ -1718,14 +1930,62 @@ function loadShop(cat){
 function filterCat(btn,cat){document.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");loadShop(cat);}
 function openProduct(id){
   db.collection("products").doc(id).get().then(d=>{
-    if(!d.exists)return;const p=d.data();curProd={id,...p};
-    document.getElementById("detail-img").innerHTML=p.imgUrl?"<img src=\""+p.imgUrl+"\" style=\"width:100%;height:270px;object-fit:cover\">":"<span style=\"font-size:70px\">🛍️</span>";
-    document.getElementById("detail-name").textContent=p.name;
-    document.getElementById("detail-stock").textContent="স্টক: "+(p.stock||0)+"টি";
-    document.getElementById("detail-desc").textContent=p.description||"কোনো বিবরণ নেই";
-    const cost=p.costPrice||p.price||0,max=p.maxPrice||p.price||0;
-    document.getElementById("detail-price").textContent="পাইকারি ৳"+cost+" — সর্বোচ্চ ৳"+max;
-    // Setup resell calculator
+    if(!d.exists)return;
+    const p=d.data();curProd={id,...p};
+    // Build image slider using DOM (no innerHTML string issues)
+    const imgs=[p.imgUrl,p.imgUrl2,p.imgUrl3].filter(Boolean);
+    const slider=document.getElementById("detail-img-slider");
+    const dots=document.getElementById("detail-img-dots");
+    const dlBtn=document.getElementById("dl-btn");
+    if(!slider)return;
+    if(true){
+      slider.innerHTML="";
+      dots.innerHTML="";
+      if(imgs.length>0){
+        imgs.forEach((url,i)=>{
+          const slide=document.createElement("div");
+          slide.style.cssText="min-width:100%;height:270px;scroll-snap-align:start;flex-shrink:0";
+          const img=document.createElement("img");
+          img.src=url;
+          img.style.cssText="width:100%;height:270px;object-fit:cover";
+          slide.appendChild(img);
+          slider.appendChild(slide);
+          // Dot
+          const dot=document.createElement("div");
+          dot.style.cssText="width:"+(i===0?"20":"8")+"px;height:8px;border-radius:20px;background:"+(i===0?"#fff":"rgba(255,255,255,0.5)")+";transition:all .3s";
+          dot.dataset.dot=i;
+          dots.appendChild(dot);
+        });
+        if(dlBtn)dlBtn.style.display="block";
+        window._prodImgs=imgs;
+        window._curSlideIdx=0;
+        slider.onscroll=()=>{
+          const ci=Math.round(slider.scrollLeft/slider.clientWidth);
+          document.querySelectorAll("[data-dot]").forEach((dt,i)=>{
+            dt.style.width=i===ci?"20px":"8px";
+            dt.style.background=i===ci?"#fff":"rgba(255,255,255,0.5)";
+          });
+          window._curSlideIdx=ci;
+        };
+      }else{
+        const empty=document.createElement("div");
+        empty.style.cssText="min-width:100%;height:270px;display:flex;align-items:center;justify-content:center;font-size:70px";
+        empty.textContent="🛍️";
+        slider.appendChild(empty);
+        if(dlBtn)dlBtn.style.display="none";
+      }
+    }
+    // Product info
+    const nameEl=document.getElementById("detail-name");
+    if(nameEl)nameEl.innerHTML=p.name+" <span style=\"font-size:13px;color:var(--gray)\">"+( p.category||"")+"</span>";
+    const cost=p.costPrice||p.price||0;
+    const max=p.maxPrice||p.price||0;
+    const priceEl=document.getElementById("detail-price");
+    if(priceEl)priceEl.textContent="পাইকারি: ৳"+cost+" — সর্বোচ্চ: ৳"+max;
+    const descEl=document.getElementById("detail-desc");
+    if(descEl)descEl.textContent=p.description||"";
+    const stockEl=document.getElementById("detail-stock");
+    if(stockEl)stockEl.textContent="স্টক: "+(p.stock||0)+"টি";
     const calcInput=document.getElementById("resell-price");
     if(calcInput){
       calcInput.min=cost;calcInput.max=max;calcInput.value=cost;
@@ -2103,12 +2363,16 @@ function loadAdminProds(){
   });
 }
 
-let _editProdId=null,_editProdImgUrl="";
+let _editProdId=null,_editProdImgUrl="",_editProdImgs=["","",""];
 function openEditProduct(id){
   _editProdId=id;
+  showL("লোড হচ্ছে...");
   db.collection("products").doc(id).get().then(d=>{
+    hideL();
     if(!d.exists)return;
-    const p=d.data();_editProdImgUrl=p.imgUrl||"";
+    const p=d.data();
+    _editProdImgUrl=p.imgUrl||"";
+    _editProdImgs=[p.imgUrl||"",p.imgUrl2||"",p.imgUrl3||""];
     document.getElementById("ep-name").value=p.name||"";
     document.getElementById("ep-cost").value=p.costPrice||p.price||"";
     document.getElementById("ep-max").value=p.maxPrice||p.price||"";
@@ -2117,9 +2381,37 @@ function openEditProduct(id){
     document.getElementById("ep-cat").value=p.category||"helmet";
     document.getElementById("ep-stock").value=p.stock||0;
     document.getElementById("ep-desc").value=p.description||"";
-    document.getElementById("ep-img-lbl").textContent=p.imgUrl?"✅ ছবি আছে — নতুন দিলে বদলাবে":"নতুন ছবি (না দিলে আগেরটা থাকবে)";
+    // Rebuild image boxes using DOM - no innerHTML string issues
+    const boxIds=["epi1-box","epi2-box","epi3-box"];
+    const inputIds=["epi1","epi2","epi3"];
+    const slots=["e1","e2","e3"];
+    boxIds.forEach((boxId,i)=>{
+      const box=document.getElementById(boxId);
+      if(!box)return;
+      box.innerHTML="";
+      const url=_editProdImgs[i];
+      if(url){
+        const img=document.createElement("img");
+        img.src=url;
+        img.style.cssText="width:100%;height:100%;object-fit:cover";
+        box.appendChild(img);
+      }else{
+        const icon=document.createElement("div");
+        icon.style.fontSize="22px";icon.textContent="📸";
+        const lbl=document.createElement("div");
+        lbl.style.cssText="font-size:10px;color:var(--gray);margin-top:4px";
+        lbl.textContent="ছবি "+(i+1);
+        box.appendChild(icon);box.appendChild(lbl);
+      }
+      const inp=document.createElement("input");
+      inp.type="file";inp.id=inputIds[i];inp.accept="image/*";inp.style.display="none";
+      const bid=boxId,sl=slots[i];
+      inp.onchange=function(){previewProdImg(this,bid,sl);};
+      box.appendChild(inp);
+      box.onclick=()=>inp.click();
+    });
     gp("admin-edit-product");
-  });
+  }).catch(()=>{hideL();toast("লোড হয়নি","er");});
 }
 
 async function saveEditProduct(){
@@ -2132,17 +2424,27 @@ async function saveEditProduct(){
   const category=document.getElementById("ep-cat").value;
   const stock=parseInt(document.getElementById("ep-stock").value)||0;
   const description=document.getElementById("ep-desc").value.trim();
-  const imgFile=document.getElementById("ep-img").files[0];
+  const img1=document.getElementById("epi1").files[0];
+  const img2=document.getElementById("epi2").files[0];
+  const img3=document.getElementById("epi3").files[0];
   if(!name||!costPrice||!maxPrice){toast("নাম ও দাম দিন!","er");return;}
   if(maxPrice<=costPrice){toast("সর্বোচ্চ দাম পাইকারি দামের বেশি হতে হবে!","er");return;}
   showL("আপডেট হচ্ছে...");
   try{
-    let imgUrl=_editProdImgUrl;
-    if(imgFile)imgUrl=await uploadImg(imgFile);
-    await db.collection("products").doc(_editProdId).update({name,costPrice,maxPrice,deliveryInside,deliveryOutside,category,stock,description,imgUrl});
+    const re1=img1?await uploadToImgBB(img1,"product"):null;
+    const re2=img2?await uploadToImgBB(img2,"product"):null;
+    const re3=img3?await uploadToImgBB(img3,"product"):null;
+    const imgUrl=re1?re1.url:(_editProdImgs[0]||_editProdImgUrl||"");
+    const imgUrl2=re2?re2.url:(_editProdImgs[1]||"");
+    const imgUrl3=re3?re3.url:(_editProdImgs[2]||"");
+    await db.collection("products").doc(_editProdId).update({
+      name,costPrice,maxPrice,deliveryInside,deliveryOutside,
+      category,stock,description,imgUrl,imgUrl2,imgUrl3
+    });
     hideL();toast("✅ পণ্য আপডেট হয়েছে!","ok");gp("admin-products");
   }catch(e){hideL();toast("সমস্যা!","er");}
 }
+
 
 async function addProduct(){
   const name=document.getElementById("pn").value.trim();
@@ -2153,18 +2455,46 @@ async function addProduct(){
   const cat=document.getElementById("pc").value;
   const stock=parseInt(document.getElementById("pst").value)||0;
   const desc=document.getElementById("pd").value.trim();
-  const imgFile=document.getElementById("pi").files[0];
+  const img1=document.getElementById("pi1").files[0];
+  const img2=document.getElementById("pi2").files[0];
+  const img3=document.getElementById("pi3").files[0];
   if(!name||!costPrice||!maxPrice){toast("নাম, পাইকারি দাম ও সর্বোচ্চ দাম দিন!","er");return;}
   if(maxPrice<=costPrice){toast("সর্বোচ্চ দাম পাইকারি দামের চেয়ে বেশি হতে হবে!","er");return;}
   showL("পণ্য যোগ হচ্ছে...");
   try{
-    const imgUrl=imgFile?await uploadImg(imgFile):"";
-    await db.collection("products").add({name,costPrice,maxPrice,deliveryInside,deliveryOutside,category:cat,stock,description:desc,imgUrl,active:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    const r1=img1?await uploadToImgBB(img1,"product"):{};
+    const r2=img2?await uploadToImgBB(img2,"product"):{};
+    const r3=img3?await uploadToImgBB(img3,"product"):{};
+    const imgUrl=r1.url||"", imgUrl2=r2.url||"", imgUrl3=r3.url||"";
+    const imgDel1=r1.deleteUrl||"", imgDel2=r2.deleteUrl||"", imgDel3=r3.deleteUrl||"";
+    await db.collection("products").add({
+      name,costPrice,maxPrice,deliveryInside,deliveryOutside,
+      category:cat,stock,description:desc,
+      imgUrl,imgUrl2,imgUrl3,
+      imgDel1,imgDel2,imgDel3,
+      active:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
     hideL();toast("✅ পণ্য যোগ হয়েছে!","ok");
-    document.getElementById("pn").value="";document.getElementById("p-cost").value="";document.getElementById("p-max").value="";
+    document.getElementById("pn").value="";
+    document.getElementById("p-cost").value="";
+    document.getElementById("p-max").value="";
+    // Reset image previews using DOM
+    ["pi1-box","pi2-box","pi3-box"].forEach((boxId,i)=>{
+      const box=document.getElementById(boxId);
+      if(!box)return;
+      box.innerHTML="";
+      const icon=document.createElement("div");icon.style.fontSize="22px";icon.textContent="📸";
+      const lbl=document.createElement("div");lbl.style.cssText="font-size:10px;color:var(--gray);margin-top:4px";lbl.textContent="ছবি "+(i+1);
+      const inp=document.createElement("input");inp.type="file";inp.id="pi"+(i+1);inp.accept="image/*";inp.style.display="none";
+      const bid=boxId;const slot=""+(i+1);
+      inp.onchange=function(){previewProdImg(this,bid,slot);};
+      box.appendChild(icon);box.appendChild(lbl);box.appendChild(inp);
+      box.onclick=()=>inp.click();
+    });
     gp("admin-products");
   }catch(e){hideL();toast("সমস্যা!","er");}
 }
+
 function deleteProd(id){showConfirm("মুছে ফেলবেন?",()=>{db.collection("products").doc(id).delete().then(()=>{toast("মুছে ফেলা হয়েছে","ok");loadAdminProds();});});}
 function loadAdminOrders(){
   const el=document.getElementById("a-ord-list");if(!el)return;
@@ -2391,6 +2721,35 @@ setTimeout(()=>{
   }
 },4000);
 
+
+function previewProdImg(input,boxId,slot){
+  if(!input.files[0])return;
+  const box=document.getElementById(boxId);
+  if(!box)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    const oldInput=box.querySelector("input");
+    box.innerHTML='<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover">';
+    if(oldInput)box.appendChild(oldInput);
+  };
+  r.readAsDataURL(input.files[0]);
+}
+
+function downloadCurProdImg(){
+  const imgs=window._prodImgs||[];
+  const idx=window._curSlideIdx||0;
+  const url=imgs[idx];
+  if(!url){toast("ছবি পাওয়া যায়নি","er");return;}
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="product_image_"+(idx+1)+".jpg";
+  a.target="_blank";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  toast("✅ ডাউনলোড শুরু হয়েছে!","ok");
+}
+
 // ===== DROPS SYSTEM 💧 =====
 function loadDropsPage(){
   if(!CU||!CUD)return;
@@ -2400,7 +2759,7 @@ function loadDropsPage(){
   // Load history
   const hist=document.getElementById("drops-history");
   if(!hist)return;
-  hist.innerHTML="<div style='text-align:center;padding:20px;color:var(--gray)'>লোড হচ্ছে...</div>";
+  try{hist.innerHTML="<div style='text-align:center;padding:20px;color:var(--gray)'>লোড হচ্ছে...</div>";}catch(e){return;}
   db.collection("drops_history").where("uid","==",CU.uid)
     .get().then(snap=>{
       if(snap.empty){
@@ -2564,6 +2923,94 @@ function copyRefCode(){
     document.execCommand("copy");document.body.removeChild(el);
     toast("✅ কোড কপি হয়েছে!","ok");
   }
+}
+
+// ===== ADMIN BLOCKED IMAGES =====
+function loadBlockedImages(){
+  const el=document.getElementById("blocked-list");
+  if(!el)return;
+  el.innerHTML="<div style='text-align:center;padding:20px;color:var(--gray)'>লোড হচ্ছে...</div>";
+  db.collection("blocked_images").where("status","==","pending").get().then(snap=>{
+    const dot=document.getElementById("blocked-dot");
+    if(dot)dot.style.display=snap.size>0?"block":"none";
+    if(snap.empty){
+      el.innerHTML="<div style='text-align:center;padding:40px;color:var(--gray)'><div style='font-size:32px'>✅</div><div style='margin-top:8px'>কোনো pending ছবি নেই</div></div>";
+      return;
+    }
+    const docs=[...snap.docs].sort((a,b)=>{
+      const at=a.data().createdAt,bt=b.data().createdAt;
+      if(!at)return 1;if(!bt)return -1;return bt.seconds-at.seconds;
+    });
+    el.innerHTML="";
+    docs.forEach(d=>{
+      const b=d.data();
+      const sc=b.scores||{};
+      const card=document.createElement("div");
+      card.className="card";card.style.marginBottom="12px";
+      const img=document.createElement("img");
+      img.src=b.tempUrl;
+      img.style.cssText="width:100%;border-radius:10px;max-height:200px;object-fit:cover;margin-bottom:10px";
+      const user=document.createElement("div");
+      user.style.cssText="font-size:13px;margin-bottom:6px";
+      user.innerHTML="<b>@"+(b.username||"অজানা")+"</b>";
+      const scores=document.createElement("div");
+      scores.style.cssText="font-size:11px;color:var(--gray);margin-bottom:10px";
+      scores.textContent="Nudity: "+(((sc.nudity||0)*100).toFixed(0))+"% | Weapon: "+(((sc.weapon||0)*100).toFixed(0))+"% | Drug: "+(((sc.drug||0)*100).toFixed(0))+"%";
+      const btns=document.createElement("div");
+      btns.style.cssText="display:flex;gap:8px";
+      const appBtn=document.createElement("button");
+      appBtn.style.cssText="flex:1;padding:10px;border:none;background:#D1FAE5;color:#065F46;border-radius:10px;font-weight:700;cursor:pointer";
+      appBtn.textContent="✅ Approve";
+      appBtn.onclick=()=>approveBlockedImg(d.id,b.uid,b.tempUrl);
+      const rejBtn=document.createElement("button");
+      rejBtn.style.cssText="flex:1;padding:10px;border:none;background:#FEE2E2;color:#991B1B;border-radius:10px;font-weight:700;cursor:pointer";
+      rejBtn.textContent="🗑️ Delete";
+      rejBtn.onclick=()=>rejectBlockedImg(d.id,b.uid,b.tempUrl);
+      btns.appendChild(appBtn);btns.appendChild(rejBtn);
+      card.appendChild(img);card.appendChild(user);card.appendChild(scores);card.appendChild(btns);
+      el.appendChild(card);
+    });
+  }).catch(()=>{el.innerHTML="<div style='text-align:center;padding:20px;color:var(--error)'>লোড হয়নি</div>";});
+}
+
+async function approveBlockedImg(docId, uid, tempUrl){
+  showL("Approve হচ্ছে...");
+  try{
+    // Fetch image from Cloudinary temp and upload to ImgBB posts album
+    const resp=await fetch(tempUrl);
+    const blob=await resp.blob();
+    const file=new File([blob],"approved.jpg",{type:"image/jpeg"});
+    const {url,deleteUrl}=await uploadToImgBB(file,"post");
+    // Save as approved post image
+    await db.collection("blocked_images").doc(docId).update({
+      status:"approved", approvedUrl:url, approvedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    sendNotif(uid,"✅ আপনার ছবি Approve হয়েছে!","Admin আপনার ছবি অনুমোদন করেছে");
+    hideL();toast("✅ Approved এবং ImgBB-তে পাঠানো হয়েছে","ok");
+    loadBlockedImages();
+  }catch(e){hideL();toast("সমস্যা হয়েছে!","er");}
+}
+
+function rejectBlockedImg(docId, uid, tempUrl){
+  showConfirm("এই ছবি Delete করবেন এবং ইউজারকে সতর্ক করবেন?",()=>{
+    showL("Delete হচ্ছে...");
+    db.collection("blocked_images").doc(docId).update({
+      status:"rejected", rejectedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }).then(()=>{
+      sendNotif(uid,"⚠️ আপনার ছবি Remove করা হয়েছে","আপনার পোস্ট করা ছবি নীতিমালা ভঙ্গের কারণে সরিয়ে দেওয়া হয়েছে");
+      hideL();toast("ছবি delete করা হয়েছে","ok");
+      loadBlockedImages();
+    }).catch(()=>{hideL();toast("সমস্যা!","er");});
+  });
+}
+
+// Check blocked images count on admin load
+function checkBlockedDot(){
+  db.collection("blocked_images").where("status","==","pending").get()
+    .then(snap=>{
+      const dot=document.getElementById("blocked-dot");
+      if(dot)dot.style.display=snap.size>0?"block":"none";
+    }).catch(()=>{});
 }
 
 // ===== CATEGORY MANAGEMENT =====
