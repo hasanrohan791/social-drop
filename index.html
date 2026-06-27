@@ -426,7 +426,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="topbar"><button class="back-btn" onclick="gp('shop')">← পিছে</button><div style="font-weight:700;font-size:15px">পণ্যের বিবরণ</div><div></div></div>
 <div style="overflow-y:auto;padding-bottom:80px">
 <div style="position:relative;width:100%;background:var(--blue-light)">
-<div id="detail-img-slider" style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch"></div>
+<div id="detail-img-slider" style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;min-height:270px;background:#f0f4f8"></div>
 <div id="detail-img-dots" style="display:flex;justify-content:center;gap:6px;padding:8px 0;position:absolute;bottom:8px;left:0;right:0"></div>
 <button id="dl-btn" onclick="downloadCurProdImg()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.55);color:#fff;border:none;border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600;display:none">⬇️ ডাউনলোড</button>
 </div>
@@ -976,20 +976,29 @@ function resizeImage(file, maxWidth=1200, quality=0.85){
   });
 }
 
-// Upload to ImgBB with album
+// Upload to ImgBB
 async function uploadToImgBB(file, albumType="post"){
   const blob = await resizeImage(file);
+  // Convert blob to base64 (ImgBB works best with base64)
+  const base64 = await new Promise((res,rej)=>{
+    const reader=new FileReader();
+    reader.onload=()=>res(reader.result.split(",")[1]);
+    reader.onerror=rej;
+    reader.readAsDataURL(blob);
+  });
   const fd = new FormData();
-  fd.append("image", blob, "image.jpg");
+  fd.append("image", base64);
   fd.append("key", IMGBB_KEY);
-  if(IMGBB_ALBUMS[albumType]) fd.append("album", IMGBB_ALBUMS[albumType]);
+  fd.append("name", albumType+"_"+Date.now());
+  // album parameter only works on paid plan — skip for free
   const r = await fetch("https://api.imgbb.com/1/upload", {method:"POST", body:fd});
+  if(!r.ok) throw new Error("ImgBB HTTP error: "+r.status);
   const d = await r.json();
   if(!d.success) throw new Error(d.error?.message||"ImgBB upload failed");
   return {
     url: d.data.url,
-    deleteUrl: d.data.delete_url,
-    thumbUrl: d.data.thumb?.url||d.data.url
+    deleteUrl: d.data.delete_url||"",
+    thumbUrl: d.data.thumb?.url||d.data.display_url||d.data.url
   };
 }
 
@@ -1944,10 +1953,24 @@ function openProduct(id){
       if(imgs.length>0){
         imgs.forEach((url,i)=>{
           const slide=document.createElement("div");
-          slide.style.cssText="min-width:100%;height:270px;scroll-snap-align:start;flex-shrink:0";
+          slide.style.cssText="min-width:100%;height:270px;scroll-snap-align:start;flex-shrink:0;background:#f0f4f8;display:flex;align-items:center;justify-content:center";
+          // Loading placeholder
+          const loader=document.createElement("div");
+          loader.style.cssText="font-size:30px;opacity:0.4";
+          loader.textContent="⏳";
+          slide.appendChild(loader);
           const img=document.createElement("img");
+          img.style.cssText="width:100%;height:270px;object-fit:cover;display:none";
+          img.onload=()=>{
+            loader.remove();
+            img.style.display="block";
+            slide.style.background="transparent";
+          };
+          img.onerror=()=>{
+            loader.textContent="❌";
+          };
           img.src=url;
-          img.style.cssText="width:100%;height:270px;object-fit:cover";
+          img.crossOrigin="anonymous";
           slide.appendChild(img);
           slider.appendChild(slide);
           // Dot
@@ -2735,19 +2758,30 @@ function previewProdImg(input,boxId,slot){
   r.readAsDataURL(input.files[0]);
 }
 
-function downloadCurProdImg(){
+async function downloadCurProdImg(){
   const imgs=window._prodImgs||[];
   const idx=window._curSlideIdx||0;
   const url=imgs[idx];
   if(!url){toast("ছবি পাওয়া যায়নি","er");return;}
-  const a=document.createElement("a");
-  a.href=url;
-  a.download="product_image_"+(idx+1)+".jpg";
-  a.target="_blank";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  toast("✅ ডাউনলোড শুরু হয়েছে!","ok");
+  toast("ডাউনলোড হচ্ছে...","");
+  try{
+    // Fetch as blob to bypass cross-origin download restriction
+    const resp=await fetch(url);
+    const blob=await resp.blob();
+    const blobUrl=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=blobUrl;
+    a.download="product_image_"+(idx+1)+".jpg";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(blobUrl),3000);
+    toast("✅ ডাউনলোড হয়েছে!","ok");
+  }catch(e){
+    // Fallback: open in new tab
+    window.open(url,"_blank");
+    toast("নতুন ট্যাবে খুলুন → দীর্ঘক্ষণ ধরে রাখুন → সেভ করুন","ok");
+  }
 }
 
 // ===== DROPS SYSTEM 💧 =====
