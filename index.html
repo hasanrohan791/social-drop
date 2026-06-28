@@ -837,7 +837,12 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 if(typeof firebase==="undefined"){
   var d=document.createElement("div");
   d.style.cssText="padding:30px;text-align:center;font-family:sans-serif";
-  d.innerHTML="<h2>Internet connection required</h2><br><button onclick='location.reload()' style='padding:10px 20px;background:#3B82F6;color:#fff;border:none;border-radius:8px;cursor:pointer'>Reload</button>";
+  var h=document.createElement("h2");h.textContent="Internet connection required";
+  var b=document.createElement("button");
+  b.textContent="Reload";
+  b.style.cssText="padding:10px 20px;background:#3B82F6;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:14px";
+  b.onclick=function(){location.reload();};
+  d.appendChild(h);d.appendChild(document.createElement("br"));d.appendChild(b);
   document.body.appendChild(d);
   throw new Error("Firebase not loaded");
 }
@@ -993,7 +998,7 @@ async function uploadToImgBB(file, albumType="post"){
   fd.append("image", base64);
   fd.append("key", IMGBB_KEY);
   fd.append("name", albumType+"_"+Date.now());
-  // album parameter only works on paid plan — skip for free
+  // album parameter only works on paid plan  skip for free
   const r = await fetch("https://api.imgbb.com/1/upload", {method:"POST", body:fd});
   if(!r.ok) throw new Error("ImgBB HTTP error: "+r.status);
   const d = await r.json();
@@ -1026,8 +1031,8 @@ async function uploadToCloudinary(file, folder="verification"){
 }
 
 // Scan image with Sightengine
-// Models: nudity (যৌন), weapon (অস্ত্র), alcohol (মদ), drug (মাদক), offensive (আপত্তিকর), gore (রক্তাক্ত)
-// তুমি threshold বাড়িয়ে বা কমিয়ে কঠোর বা নমনীয় করতে পারবে (0-1 scale)
+// Models: nudity (), weapon (), alcohol (), drug (), offensive (), gore ()
+//  threshold         (0-1 scale)
 const SCAN_CONFIG = {
   models: "nudity-2.0,weapon,recreational_drug,offensive,gore-2.0",
   thresholds: {
@@ -1106,12 +1111,12 @@ async function uploadPostImg(file){
     }).catch(()=>{});
     throw new Error("BLOCKED");
   }
-  // Safe — upload to ImgBB posts album
+  // Safe  upload to ImgBB posts album
   showL("ছবি আপলোড হচ্ছে...");
   return await uploadToImgBB(file, "post");
 }
 
-// Profile pic upload → ImgBB profile album
+// Profile pic upload  ImgBB profile album
 async function uploadProfileImg(input){
   if(!input.files[0]||!CU)return;
   showL("প্রোফাইল ছবি আপলোড হচ্ছে...");
@@ -1140,7 +1145,7 @@ async function uploadProfileImg(input){
   }catch(e){hideL();toast("আপলোড হয়নি!","er");}
 }
 
-// Generic uploadImg (kept for backward compat — routes by context)
+// Generic uploadImg (kept for backward compat  routes by context)
 async function uploadImg(file, type="post"){
   if(type==="verification") return await uploadToCloudinary(file);
   const result = await uploadToImgBB(file, type);
@@ -1348,7 +1353,7 @@ async function uploadProfileImg(input){
       await batch1.commit();
     }
     
-    // 3. Update all comments by this user across posts (subcollection — do best-effort)
+    // 3. Update all comments by this user across posts (subcollection  do best-effort)
     db.collectionGroup("comments").where("uid","==",CU.uid).get()
       .then(cSnap=>{
         if(!cSnap.empty){
@@ -2093,7 +2098,7 @@ function onDistrictChange(){
 function updateResellCalc(cost,max){
   const input=document.getElementById("resell-price");
   if(!input)return;
-  // Allow free typing — just show profit live, don't force value
+  // Allow free typing  just show profit live, don't force value
   let val=parseFloat(input.value);
   if(isNaN(val)||val==="")val=cost;
   const profit=val-cost;
@@ -2130,7 +2135,7 @@ function goToOrder(){
   if(distSel)distSel.value="";
   const zoneEl=document.getElementById("delivery-zone");
   if(zoneEl)zoneEl.style.display="none";
-  // Reset payment — default COD
+  // Reset payment  default COD
   selPay="cod";
   document.querySelectorAll("#order .verify-opt").forEach(o=>o.classList.remove("active"));
   const firstOpt=document.querySelector("#order .verify-opt");
@@ -2163,13 +2168,13 @@ function updateOrderSummary(){
   const el=document.getElementById("order-summary");
   if(!el)return;
   if(selPay==="cod"){
-    // COD: শুধু ডেলিভারি চার্জ আগে দিতে হবে
+    // COD:      
     el.innerHTML="<div style=\"background:#FFF3CD;border-radius:9px;padding:10px 12px;margin-bottom:8px;font-size:13px\">📦 পণ্যের দাম <b>৳"+subtotal+"</b> পণ্য পেয়ে দিবেন</div>"
       +"ডেলিভারি চার্জ (এখন দিতে হবে): <b style=\"color:var(--blue)\">৳"+deliveryCharge+"</b><br>"
       +"<span style=\"font-size:12px;color:var(--gray)\">পণ্যের দাম ৳"+price+" × "+qty+" = ৳"+subtotal+" (পণ্য পাওয়ার পর)</span><br>"
       +"<b style=\"font-size:16px;color:var(--blue)\">এখন পরিশোধ: ৳"+deliveryCharge+"</b>";
   }else{
-    // Full payment: সব একসাথে
+    // Full payment:  
     el.innerHTML="পণ্যের দাম: ৳"+price+" × "+qty+" = ৳"+subtotal+"<br>"
       +"ডেলিভারি চার্জ: ৳"+deliveryCharge+"<br>"
       +"<b style=\"font-size:16px;color:var(--blue)\">সর্বমোট: ৳"+total+"</b>";
@@ -2836,7 +2841,7 @@ async function downloadCurProdImg(){
   }
 }
 
-// ===== DROPS SYSTEM 💧 =====
+// ===== DROPS SYSTEM  =====
 function loadDropsPage(){
   if(!CU||!CUD)return;
   // Show balance
@@ -3021,8 +3026,7 @@ function copyRefCode(){
   b2.textContent="📤 শেয়ার মেসেজ কপি করুন";
   b2.onclick=()=>{
     ov.remove();
-    const msg="Social Drop অ্যাপে আমার রেফার কোড: "+code+"
-https://social-drop-eight.vercel.app";
+    const msg="Social Drop App Refer Code: "+code+"\nhttps://social-drop-eight.vercel.app";
     doCopy(msg, "✅ শেয়ার মেসেজ কপি হয়েছে!");
   };
   // Button 3: cancel
@@ -3169,7 +3173,7 @@ function showProfPicFullscreen(imgUrl, name){
   ov.onclick=e=>{if(e.target===ov)ov.remove();};
 }
 
-// Own profile pic click — if has pic show fullscreen, else upload
+// Own profile pic click  if has pic show fullscreen, else upload
 function onProfAvClick(){
   if(CUD&&CUD.profileImg){
     // Show options: view or change
@@ -3360,7 +3364,7 @@ function syncShopCategories(){
   db.collection("categories").orderBy("createdAt","asc").get().then(snap=>{
     const row=document.getElementById("shop-cat-row");
     if(!row||snap.empty)return;
-    // Keep "সব" button, replace rest
+    // Keep "" button, replace rest
     let html='<button class="cat-btn active" onclick="filterCat(this,\'all\')">সব</button>';
     snap.forEach(d=>{
       const c=d.data();
