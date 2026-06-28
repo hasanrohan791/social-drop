@@ -5,7 +5,7 @@
 <meta name="monetag" content="b8bbd485afffc16d3917cac77d322ac7">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Social Drop</title>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" onerror="document.body.innerHTML='<div style=padding:30px;text-align:center;font-family:sans-serif><h2>⚠️ ইন্টারনেট সংযোগ প্রয়োজন</h2><p>অ্যাপটি চালু করতে ইন্টারনেট চালু রাখুন।</p><button onclick=location.reload() style=margin-top:14px;padding:10px 20px;background:#3B82F6;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer>🔄 পুনরায় চেষ্টা</button></div>'"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
@@ -835,8 +835,11 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="toast" id="toast"></div>
 <script>
 if(typeof firebase==="undefined"){
-  document.body.innerHTML='<div style="padding:30px;text-align:center;font-family:sans-serif"><h2>⚠️ লোড হয়নি</h2><p style="margin-top:8px;color:#666">ইন্টারনেট চালু আছে কিনা দেখুন এবং পেজ রিলোড করুন।</p><button onclick="location.reload()" style="margin-top:14px;padding:10px 22px;background:#3B82F6;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer">🔄 রিলোড</button></div>';
-  throw new Error("Firebase CDN not loaded");
+  var d=document.createElement("div");
+  d.style.cssText="padding:30px;text-align:center;font-family:sans-serif";
+  d.innerHTML="<h2>Internet connection required</h2><br><button onclick='location.reload()' style='padding:10px 20px;background:#3B82F6;color:#fff;border:none;border-radius:8px;cursor:pointer'>Reload</button>";
+  document.body.appendChild(d);
+  throw new Error("Firebase not loaded");
 }
 window.onerror=function(msg,src,line,col,err){
   console.error("GLOBAL ERROR:",msg,"Line:",line,"Col:",col);
@@ -1023,23 +1026,55 @@ async function uploadToCloudinary(file, folder="verification"){
 }
 
 // Scan image with Sightengine
+// Models: nudity (যৌন), weapon (অস্ত্র), alcohol (মদ), drug (মাদক), offensive (আপত্তিকর), gore (রক্তাক্ত)
+// তুমি threshold বাড়িয়ে বা কমিয়ে কঠোর বা নমনীয় করতে পারবে (0-1 scale)
+const SCAN_CONFIG = {
+  models: "nudity-2.0,weapon,recreational_drug,offensive,gore-2.0",
+  thresholds: {
+    nudity: 0.5,
+    weapon: 0.7,
+    drug: 0.7,
+    offensive: 0.7,
+    gore: 0.7
+  }
+};
+
 async function scanImage(file){
   try{
+    const blob = await resizeImage(file, 800, 0.8);
     const fd = new FormData();
-    fd.append("media", file, "image.jpg");
-    fd.append("models", "nudity-2.0,weapon,alcohol,recreational_drug,offensive");
+    fd.append("media", blob, "scan.jpg");
+    fd.append("models", SCAN_CONFIG.models);
     fd.append("api_user", SE_USER);
     fd.append("api_secret", SE_SECRET);
     const r = await fetch("https://api.sightengine.com/1.0/check.json",{method:"POST",body:fd});
+    if(!r.ok) return {safe:true};
     const d = await r.json();
     if(d.status!=="success") return {safe:true};
-    const nudity = d.nudity?.sexual_activity||0;
-    const weapon = d.weapon||0;
-    const drug   = d.recreational_drug?.prob||0;
-    const isUnsafe = nudity>0.5 || weapon>0.7 || drug>0.7;
-    return {safe:!isUnsafe, scores:{nudity,weapon,drug}, raw:d};
+    const t = SCAN_CONFIG.thresholds;
+    const scores = {
+      nudity:   Math.max(d.nudity?.sexual_activity||0, d.nudity?.sexual_display||0),
+      weapon:   d.weapon?.classes?.firearm||d.weapon?.classes?.knife||0,
+      drug:     d.recreational_drug?.prob||0,
+      offensive:d.offensive?.prob||0,
+      gore:     d.gore?.prob||0
+    };
+    const isUnsafe = scores.nudity   > t.nudity
+                  || scores.weapon   > t.weapon
+                  || scores.drug     > t.drug
+                  || scores.offensive> t.offensive
+                  || scores.gore     > t.gore;
+    const reason = isUnsafe ? (
+      scores.nudity>t.nudity?"যৌন বিষয়বস্তু":
+      scores.weapon>t.weapon?"অস্ত্র":
+      scores.drug>t.drug?"মাদকদ্রব্য":
+      scores.offensive>t.offensive?"আপত্তিকর":
+      "রক্তাক্ত/ভয়ংকর"
+    ):"";
+    return {safe:!isUnsafe, scores, reason};
   }catch(e){
-    return {safe:true}; // fail open
+    console.warn("Sightengine error:", e);
+    return {safe:true}; // network error - fail open (allow)
   }
 }
 
@@ -1048,25 +1083,27 @@ async function uploadPostImg(file){
   showL("ছবি যাচাই হচ্ছে...");
   const scan = await scanImage(file);
   if(!scan.safe){
-    // Upload to Cloudinary temp for admin review
-    const blob = await resizeImage(file, 800, 0.7);
-    const tempUrl = await uploadToCloudinary(new File([blob],"blocked.jpg"), "blocked_posts");
-    // Save to Firestore for admin review
+    // Store thumbnail as base64 in Firestore - NO external upload needed
+    const blob = await resizeImage(file, 400, 0.5); // small thumbnail
+    const base64 = await new Promise((res)=>{
+      const reader=new FileReader();
+      reader.onload=()=>res(reader.result);
+      reader.readAsDataURL(blob);
+    });
     await db.collection("blocked_images").add({
       uid: CU.uid,
       username: CUD&&CUD.username||"",
-      tempUrl,
+      tempUrl: base64,
       scores: scan.scores,
+      reason: scan.reason||"অজানা কারণ",
       status: "pending",
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    // Notify admin
     db.collection("admin_notifications").add({
       type:"blocked_image", uid:CU.uid,
       username:CUD&&CUD.username||"",
-      tempUrl,
       createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
+    }).catch(()=>{});
     throw new Error("BLOCKED");
   }
   // Safe — upload to ImgBB posts album
@@ -1576,15 +1613,21 @@ async function submitPost(){
     if(imgFile){
       try{
         const result = await uploadPostImg(imgFile);
-        imgUrl = result.url;
-        imgDeleteUrl = result.deleteUrl;
-      }catch(e){
-        if(e.message==="BLOCKED"){
+        if(!result||!result.url){
           hideL();
-          toast("⚠️ ছবিটি নিরাপত্তা যাচাইয়ে আটকে গেছে। Admin পর্যালোচনা করবে।","er");
+          toast("ছবি আপলোড হয়নি, আবার চেষ্টা করুন","er");
           return;
         }
-        throw e;
+        imgUrl = result.url;
+        imgDeleteUrl = result.deleteUrl||"";
+      }catch(e){
+        hideL();
+        if(e.message==="BLOCKED"){
+          toast("⚠️ ছবিটি নিরাপত্তা যাচাইয়ে আটকে গেছে। Admin পর্যালোচনা করবে।","er");
+        }else{
+          toast("ছবি আপলোড হয়নি: "+( e.message||""),"er");
+        }
+        return; // STOP - don't post
       }
     }
     await db.collection("posts").add({
@@ -2760,27 +2803,36 @@ function previewProdImg(input,boxId,slot){
 
 async function downloadCurProdImg(){
   const imgs=window._prodImgs||[];
-  const idx=window._curSlideIdx||0;
-  const url=imgs[idx];
+  const ci=window._curSlideIdx||0;
+  const url=imgs[ci];
   if(!url){toast("ছবি পাওয়া যায়নি","er");return;}
   toast("ডাউনলোড হচ্ছে...","");
   try{
-    // Fetch as blob to bypass cross-origin download restriction
-    const resp=await fetch(url);
-    const blob=await resp.blob();
-    const blobUrl=URL.createObjectURL(blob);
-    const a=document.createElement("a");
-    a.href=blobUrl;
-    a.download="product_image_"+(idx+1)+".jpg";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(blobUrl),3000);
-    toast("✅ ডাউনলোড হয়েছে!","ok");
+    const img=new Image();
+    img.crossOrigin="anonymous";
+    await new Promise((res,rej)=>{
+      img.onload=res;
+      img.onerror=()=>{window.open(url,"_blank");toast("ছবি খুলুন → দীর্ঘক্ষণ চাপ দিন → সেভ করুন","ok");res();};
+      img.src=url;
+    });
+    if(!img.complete||!img.naturalWidth)return;
+    const canvas=document.createElement("canvas");
+    canvas.width=img.naturalWidth;
+    canvas.height=img.naturalHeight;
+    canvas.getContext("2d").drawImage(img,0,0);
+    canvas.toBlob(blob=>{
+      if(!blob){window.open(url,"_blank");return;}
+      const blobUrl=URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      a.href=blobUrl;
+      a.download="product_"+(ci+1)+".jpg";
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(blobUrl),5000);
+      toast("✅ সেভ হয়েছে!","ok");
+    },"image/jpeg",0.92);
   }catch(e){
-    // Fallback: open in new tab
     window.open(url,"_blank");
-    toast("নতুন ট্যাবে খুলুন → দীর্ঘক্ষণ ধরে রাখুন → সেভ করুন","ok");
+    toast("ছবি খুলুন → দীর্ঘক্ষণ চাপ দিন → গ্যালারিতে সেভ করুন","ok");
   }
 }
 
@@ -2948,15 +3000,59 @@ function renderRefList(users,gen){
 function copyRefCode(){
   const code=CUD&&CUD.refCode;
   if(!code){toast("কোড পাওয়া যায়নি","er");return;}
-  const text="Social Drop অ্যাপে আমার রেফার কোড: "+code+"\nhttps://social-drop-eight.vercel.app";
+  // Show options: copy code only OR copy full share message
+  const ov=document.createElement("div");
+  ov.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:flex-end;justify-content:center;padding:20px";
+  const box=document.createElement("div");
+  box.style.cssText="background:#fff;border-radius:18px;padding:18px;width:100%;max-width:400px";
+  box.innerHTML="<div style='font-weight:700;font-size:15px;margin-bottom:6px;text-align:center'>কী কপি করবেন?</div>"
+    +"<div style='font-size:13px;color:var(--gray);text-align:center;margin-bottom:14px'>কোড: <b style='font-size:18px;letter-spacing:3px;color:var(--blue)'>"+code+"</b></div>";
+  // Button 1: copy code only
+  const b1=document.createElement("button");
+  b1.style.cssText="width:100%;padding:13px;border:1.5px solid var(--blue);background:#fff;color:var(--blue);border-radius:12px;font-weight:700;cursor:pointer;font-size:14px;margin-bottom:8px";
+  b1.textContent="📋 শুধু কোড কপি করুন";
+  b1.onclick=()=>{
+    ov.remove();
+    doCopy(code, "✅ কোড কপি হয়েছে!");
+  };
+  // Button 2: copy full share message
+  const b2=document.createElement("button");
+  b2.style.cssText="width:100%;padding:13px;border:none;background:var(--blue);color:#fff;border-radius:12px;font-weight:700;cursor:pointer;font-size:14px;margin-bottom:8px";
+  b2.textContent="📤 শেয়ার মেসেজ কপি করুন";
+  b2.onclick=()=>{
+    ov.remove();
+    const msg="Social Drop অ্যাপে আমার রেফার কোড: "+code+"
+https://social-drop-eight.vercel.app";
+    doCopy(msg, "✅ শেয়ার মেসেজ কপি হয়েছে!");
+  };
+  // Button 3: cancel
+  const b3=document.createElement("button");
+  b3.style.cssText="width:100%;padding:12px;border:none;background:var(--border);color:var(--gray);border-radius:12px;font-weight:700;cursor:pointer;font-size:14px";
+  b3.textContent="বাতিল";
+  b3.onclick=()=>ov.remove();
+  box.appendChild(b1);box.appendChild(b2);box.appendChild(b3);
+  ov.appendChild(box);
+  document.body.appendChild(ov);
+  ov.onclick=e=>{if(e.target===ov)ov.remove();};
+}
+
+function doCopy(text, successMsg){
   if(navigator.clipboard){
-    navigator.clipboard.writeText(text).then(()=>toast("✅ কোড কপি হয়েছে!","ok")).catch(()=>toast("কপি হয়নি","er"));
+    navigator.clipboard.writeText(text).then(()=>toast(successMsg,"ok")).catch(()=>{
+      _legacyCopy(text, successMsg);
+    });
   }else{
-    const el=document.createElement("textarea");
-    el.value=text;document.body.appendChild(el);el.select();
-    document.execCommand("copy");document.body.removeChild(el);
-    toast("✅ কোড কপি হয়েছে!","ok");
+    _legacyCopy(text, successMsg);
   }
+}
+
+function _legacyCopy(text, successMsg){
+  const el=document.createElement("textarea");
+  el.value=text;el.style.position="fixed";el.style.opacity="0";
+  document.body.appendChild(el);el.focus();el.select();
+  try{document.execCommand("copy");toast(successMsg,"ok");}
+  catch(e){toast("কপি হয়নি","er");}
+  document.body.removeChild(el);
 }
 
 // ===== ADMIN BLOCKED IMAGES =====
