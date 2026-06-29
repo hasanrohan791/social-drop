@@ -1,5 +1,4 @@
-<!DOC
-<div id="explore-ad-slot" style="margin:8px 12px"></div>TYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
@@ -94,10 +93,6 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 .act-btn{display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--gray);font-weight:500}
 .act-btn.liked{color:var(--error)}
 .act-btn span{font-size:17px}
-.sd-ad-wrap{width:100%;overflow:hidden;background:#fff}
-.sd-ad-large{min-height:100px;display:flex;align-items:center;justify-content:center;background:#f8faff;border-radius:12px;margin:8px 12px}
-.sd-ad-small{min-height:54px;display:flex;align-items:center;justify-content:center;background:#f8faff;border-bottom:1px solid var(--border)}
-.sd-ad-label{font-size:9px;color:#aaa;text-align:right;padding:2px 8px;letter-spacing:0.5px}
 .ad-card{background:#fff;margin-bottom:8px;border:1px solid var(--blue-light);position:relative}
 .ad-tag{position:absolute;top:7px;right:7px;background:var(--blue-light);color:var(--blue);font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px}
 .ad-body{padding:13px;display:flex;align-items:center;gap:10px}
@@ -184,19 +179,6 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 .toast.show{opacity:1;pointer-events:auto}
 .toast.ok{background:var(--success)}.toast.er{background:var(--error)}
 </style>
-<!-- Adsterra Native Banner -->
-<script async="async" data-cfasync="false" src="https://pl30118639.effectivecpmnetwork.com/c9cf3f48061b11f7075851264fcc3404/invoke.js"></script>
-<!-- Adsterra 320x50 Banner -->
-<script>
-  atOptions = {
-    'key' : 'c1d5c37d3d359f715928b4100815564b',
-    'format' : 'iframe',
-    'height' : 50,
-    'width' : 320,
-    'params' : {}
-  };
-</script>
-<script src="https://www.highperformanceformat.com/c1d5c37d3d359f715928b4100815564b/invoke.js"></script>
 </head>
 <body>
 
@@ -247,7 +229,6 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <button class="ibtn" onclick="gp('chat-list')">💬<span class="ndot" id="chat-dot"></span></button>
 <button class="ibtn" onclick="gp('notifications')">🔔<span class="ndot" id="ndot"></span></button>
 </div></div>
-<div id="home-ad-slot"></div>
 <div class="ad-banner" style="margin:8px 12px"><div class="ad-lbl">বিজ্ঞাপন</div><div style="font-size:13px;font-weight:500">🛍️ Social Drop Shop এ নতুন পণ্য এসেছে!</div></div>
 <div class="feed" id="feed-container"><div style="text-align:center;padding:40px;color:var(--gray)">লোড হচ্ছে...</div></div>
 <div class="bnav">
@@ -292,9 +273,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="type-row">
 <button class="type-btn active" onclick="document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">🌍 সবাই দেখবে</button>
 <button class="type-btn" onclick="document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">👥 ফলোয়াররা</button>
-</div></div>
-<div id="create-ad-slot" style="margin:12px 0 0"></div>
-</div></div>
+</div></div></div></div>
 
 <!-- PROFILE -->
 <div class="page" id="profile">
@@ -406,8 +385,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 
 <!-- CHAT LIST -->
 <div class="page" id="chat-list">
-<div class="topbar"><button class="back-btn" onclick="gp('home')">← পিছে</button><div style="font-weight:700;font-size:15px">💬 মেসেজ</div>
-<div id="chatlist-ad-slot"></div><div></div></div>
+<div class="topbar"><button class="back-btn" onclick="gp('home')">← পিছে</button><div style="font-weight:700;font-size:15px">💬 মেসেজ</div><div></div></div>
 <div style="overflow-y:auto;padding-bottom:20px">
 <div style="margin:10px 12px;border-radius:11px;overflow:hidden;background:linear-gradient(135deg,#1A73E8,#0D3B8C);padding:14px;text-align:center;color:#fff;position:relative">
   <div style="position:absolute;top:6px;right:8px;font-size:9px;background:rgba(255,255,255,0.2);padding:2px 7px;border-radius:10px">বিজ্ঞাপন</div>
@@ -802,9 +780,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 
 <!-- HUB DROPS PAGE -->
 <div class="page" id="hub-drops">
-<div class="topbar"><button class="back-btn" onclick="gp('home')">← পিছে</button><div style="font-weight:700;font-size:15px">💧 আমার ড্রপস</div><div>
-<div id="drops-ad-slot" style="margin:8px 0"></div>
-</div></div>
+<div class="topbar"><button class="back-btn" onclick="gp('home')">← পিছে</button><div style="font-weight:700;font-size:15px">💧 আমার ড্রপস</div><div></div></div>
 <div class="auth-body">
 
 <!-- Balance Card -->
@@ -997,10 +973,7 @@ function gp(id,skipHistory){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   const el=document.getElementById(id);
   if(el){el.classList.add("active");window.scrollTo(0,0);}
-  if(id==="home"){
-    renderFeed();
-    injectAdBanner("home-ad-slot","small","shop");
-  }
+  if(id==="home")renderFeed();
   if(id==="shop"){loadShop("all");syncShopCategories();}
   if(id==="my-orders")loadMyOrders();
   if(id==="notifications")loadNotifs();
@@ -1014,14 +987,14 @@ function gp(id,skipHistory){
   if(id==="admin-ads")loadAds();
   if(id==="admin-categories")loadAdminCategories();
   if(id==="hub-refer")loadReferPage();
-  if(id==="hub-drops"){loadDropsPage();setTimeout(()=>injectAdBanner("drops-ad-slot","small","refer"),500);}
+  if(id==="hub-drops")loadDropsPage();
   if(id==="admin-withdrawals")loadWdReqs();
   if(id==="admin-blocked")loadBlockedImages();
   if(id==="hub-network"){loadNetworkPage();}
   if(id==="admin-network"){loadAdminNetwork();}
   if(id==="profile")loadMyPosts();
-  if(id==="explore"){loadExplore();injectAdBanner("explore-ad-slot","large","refer");}
-  if(id==="chat-list"){loadChatList();injectAdBanner("chatlist-ad-slot","small","shop");}
+  if(id==="explore")loadExplore();
+  if(id==="chat-list")loadChatList();
   if(id==="verify"){const vs=document.getElementById("verify-status");if(vs&&CUD&&CUD.verified)vs.innerHTML="<div style=\"text-align:center;padding:16px;background:#D1FAE5;border-radius:11px;color:#065F46;font-weight:700\">✅ আপনার অ্যাকাউন্ট ভেরিফাইড!</div>";}
   // Push to browser history so Android back button navigates pages instead of closing the app
   if(!skipHistory){
@@ -1551,112 +1524,8 @@ function renderFeed(){
   },()=>{c.innerHTML="<div style=\"text-align:center;padding:30px;color:var(--error)\">লোড হয়নি। আবার চেষ্টা করুন।</div>";});
 }
 
-// ===== AD BANNER SYSTEM =====
-// Adsterra codes
-const AD_NATIVE_SRC = "https://pl30118639.effectivecpmnetwork.com/c9cf3f48061b11f7075851264fcc3404/invoke.js";
-const AD_NATIVE_ID = "container-c9cf3f48061b11f7075851264fcc3404";
-const AD_320x50_KEY = "c1d5c37d3d359f715928b4100815564b";
-
-let _adCount = 0;
-
-function buildAdBanner(size, fallbackHtml){
-  _adCount++;
-  const uid = "adslot_"+_adCount;
-  const isLarge = size === "large";
-  const wrapStyle = isLarge
-    ? "margin:8px 12px;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.06)"
-    : "background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)";
-
-  const div = document.createElement("div");
-  div.style.cssText = wrapStyle;
-  div.innerHTML = "<div style='font-size:9px;color:#bbb;text-align:right;padding:2px 8px;letter-spacing:0.5px'>বিজ্ঞাপন</div>"
-    + "<div id='"+uid+"' style='min-height:"+(isLarge?"90":"50")+"px;display:flex;align-items:center;justify-content:center'>"
-    + "</div>";
-
-  // Try to inject Adsterra 320x50
-  setTimeout(()=>{
-    const slot = document.getElementById(uid);
-    if(!slot) return;
-    try{
-      const w = document.createElement("ins");
-      w.className = "adsbygoogle";
-      // Use Adsterra invoke approach
-      const s = document.createElement("script");
-      s.async = true;
-      window["atOptions"] = {key:AD_320x50_KEY, format:"iframe", height:50, width:320, params:{}};
-      s.src = "https://www.highperformanceformat.com/"+AD_320x50_KEY+"/invoke.js";
-      slot.appendChild(s);
-    }catch(e){}
-    // Fallback after 3s if empty
-    setTimeout(()=>{
-      const sl = document.getElementById(uid);
-      if(sl && sl.offsetHeight < 20){
-        sl.innerHTML = fallbackHtml;
-      }
-    }, 3000);
-  }, 300);
-
-  return div;
-}
-
-function getDefaultFallback(type){
-  const shopHtml="<div style=\"display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer\" onclick=\"gp('shop')\">"
-    +"<div style=\"font-size:24px\">🛍️</div>"
-    +"<div style=\"flex:1\"><div style=\"font-weight:700;font-size:13px\">Social Drop Shop</div>"
-    +"<div style=\"font-size:11px;color:var(--gray)\">নতুন পণ্য দেখুন</div></div>"
-    +"<div style=\"font-size:11px;color:var(--blue);font-weight:700\">দেখুন</div></div>";
-  const referHtml="<div style=\"display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer\" onclick=\"gp('hub-refer')\">"
-    +"<div style=\"font-size:24px\">🔗</div>"
-    +"<div style=\"flex:1\"><div style=\"font-weight:700;font-size:13px\">রেফার করুন, ড্রপস পান!</div>"
-    +"<div style=\"font-size:11px;color:var(--gray)\">বন্ধু আনুন, ৫০০ ড্রপস পান</div></div>"
-    +"<div style=\"font-size:11px;color:#F59E0B;font-weight:700\">রেফার</div></div>";
-  if(type==="refer")return referHtml;
-  return shopHtml;
-}
-
-function injectAdBanner(containerId, size, fallbackType){
-  const container = document.getElementById(containerId);
-  if(!container) return;
-  container.innerHTML = "";
-  const banner = buildAdBanner(size, getDefaultFallback(fallbackType));
-  container.appendChild(banner);
-}
-// ===== END AD SYSTEM =====
-
 function renderAdCard(){
-  // Unique ID for each ad slot so multiple ads don't conflict
-  const uid = "ad_"+Date.now()+"_"+Math.random().toString(36).slice(2,6);
-  // Try Adsterra Native Banner first, fallback to own promo
-  return "<div class=\"ad-card\" style=\"padding:0;overflow:hidden\">"
-    +"<div style=\"display:flex;justify-content:space-between;align-items:center;padding:8px 12px 4px;border-bottom:1px solid var(--border)\">"
-    +"<span style=\"font-size:10px;color:var(--gray);font-weight:600;letter-spacing:0.5px\">বিজ্ঞাপন</span>"
-    +"<span style=\"font-size:10px;color:var(--gray)\">Adsterra</span></div>"
-    +"<div id=\""+uid+"\" style=\"min-height:120px;display:flex;align-items:center;justify-content:center\">"
-    // Adsterra native container
-    +"<div id=\"container-c9cf3f48061b11f7075851264fcc3404-"+uid+"\"></div>"
-    +"</div>"
-    // Fallback - shows if Adsterra fails to load
-    +"<div id=\"fb_"+uid+"\" style=\"display:none\">"
-    +"<div class=\"ad-body\" onclick=\"gp('shop')\" style=\"cursor:pointer\">"
-    +"<div class=\"ad-icon\">🛍️</div>"
-    +"<div><div style=\"font-size:14px;font-weight:700\">Social Drop Shop</div>"
-    +"<div style=\"font-size:12px;color:var(--gray)\">সেরা দামে পণ্য কিনুন</div></div></div>"
-    +"<button class=\"ad-cta\" onclick=\"gp('shop')\">দেখুন →</button>"
-    +"</div>"
-    +"</div>";
-}
-
-// Check if Adsterra loaded, show fallback if not
-function checkAdFallback(uid){
-  setTimeout(()=>{
-    const container=document.getElementById("container-c9cf3f48061b11f7075851264fcc3404-"+uid);
-    const fb=document.getElementById("fb_"+uid);
-    const main=document.getElementById(uid);
-    if(container&&!container.innerHTML.trim()&&fb&&main){
-      main.style.display="none";
-      fb.style.display="block";
-    }
-  },3000);
+  return "<div class=\"ad-card\"><div class=\"ad-tag\">বিজ্ঞাপন</div><div class=\"ad-body\"><div class=\"ad-icon\">🛍️</div><div><div style=\"font-size:14px;font-weight:700\">Social Drop Shop</div><div style=\"font-size:12px;color:var(--gray)\">সেরা দামে হ্যান্ডমেড পণ্য</div></div></div><button class=\"ad-cta\" onclick=\"gp('shop')\">এখনই দেখুন →</button></div>";
 }
 
 function openPostMenu(postId,authorUid){
@@ -2998,10 +2867,7 @@ document.addEventListener("touchend",e=>{
     ptrEl.querySelector("div").style.animation="spin .7s linear infinite";
     const active=document.querySelector(".page.active");
     const id=active?active.id:"";
-    if(id==="home"){
-    renderFeed();
-    injectAdBanner("home-ad-slot","small","shop");
-  }
+    if(id==="home")renderFeed();
     else if(id==="shop")loadShop("all");
     else if(id==="my-orders")loadMyOrders();
     else if(id==="notifications")loadNotifs();
