@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<!DOC
+<div id="explore-ad-slot" style="margin:8px 12px"></div>TYPE html>
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
@@ -93,6 +94,10 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 .act-btn{display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--gray);font-weight:500}
 .act-btn.liked{color:var(--error)}
 .act-btn span{font-size:17px}
+.sd-ad-wrap{width:100%;overflow:hidden;background:#fff}
+.sd-ad-large{min-height:100px;display:flex;align-items:center;justify-content:center;background:#f8faff;border-radius:12px;margin:8px 12px}
+.sd-ad-small{min-height:54px;display:flex;align-items:center;justify-content:center;background:#f8faff;border-bottom:1px solid var(--border)}
+.sd-ad-label{font-size:9px;color:#aaa;text-align:right;padding:2px 8px;letter-spacing:0.5px}
 .ad-card{background:#fff;margin-bottom:8px;border:1px solid var(--blue-light);position:relative}
 .ad-tag{position:absolute;top:7px;right:7px;background:var(--blue-light);color:var(--blue);font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px}
 .ad-body{padding:13px;display:flex;align-items:center;gap:10px}
@@ -179,6 +184,19 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 .toast.show{opacity:1;pointer-events:auto}
 .toast.ok{background:var(--success)}.toast.er{background:var(--error)}
 </style>
+<!-- Adsterra Native Banner -->
+<script async="async" data-cfasync="false" src="https://pl30118639.effectivecpmnetwork.com/c9cf3f48061b11f7075851264fcc3404/invoke.js"></script>
+<!-- Adsterra 320x50 Banner -->
+<script>
+  atOptions = {
+    'key' : 'c1d5c37d3d359f715928b4100815564b',
+    'format' : 'iframe',
+    'height' : 50,
+    'width' : 320,
+    'params' : {}
+  };
+</script>
+<script src="https://www.highperformanceformat.com/c1d5c37d3d359f715928b4100815564b/invoke.js"></script>
 </head>
 <body>
 
@@ -229,6 +247,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <button class="ibtn" onclick="gp('chat-list')">💬<span class="ndot" id="chat-dot"></span></button>
 <button class="ibtn" onclick="gp('notifications')">🔔<span class="ndot" id="ndot"></span></button>
 </div></div>
+<div id="home-ad-slot"></div>
 <div class="ad-banner" style="margin:8px 12px"><div class="ad-lbl">বিজ্ঞাপন</div><div style="font-size:13px;font-weight:500">🛍️ Social Drop Shop এ নতুন পণ্য এসেছে!</div></div>
 <div class="feed" id="feed-container"><div style="text-align:center;padding:40px;color:var(--gray)">লোড হচ্ছে...</div></div>
 <div class="bnav">
@@ -273,7 +292,9 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="type-row">
 <button class="type-btn active" onclick="document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">🌍 সবাই দেখবে</button>
 <button class="type-btn" onclick="document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">👥 ফলোয়াররা</button>
-</div></div></div></div>
+</div></div>
+<div id="create-ad-slot" style="margin:12px 0 0"></div>
+</div></div>
 
 <!-- PROFILE -->
 <div class="page" id="profile">
@@ -385,7 +406,8 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 
 <!-- CHAT LIST -->
 <div class="page" id="chat-list">
-<div class="topbar"><button class="back-btn" onclick="gp('home')">← পিছে</button><div style="font-weight:700;font-size:15px">💬 মেসেজ</div><div></div></div>
+<div class="topbar"><button class="back-btn" onclick="gp('home')">← পিছে</button><div style="font-weight:700;font-size:15px">💬 মেসেজ</div>
+<div id="chatlist-ad-slot"></div><div></div></div>
 <div style="overflow-y:auto;padding-bottom:20px">
 <div style="margin:10px 12px;border-radius:11px;overflow:hidden;background:linear-gradient(135deg,#1A73E8,#0D3B8C);padding:14px;text-align:center;color:#fff;position:relative">
   <div style="position:absolute;top:6px;right:8px;font-size:9px;background:rgba(255,255,255,0.2);padding:2px 7px;border-radius:10px">বিজ্ঞাপন</div>
@@ -607,7 +629,10 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div style="color:#fff;font-weight:700;font-size:15px;margin-bottom:6px">আপনার রেফার কোড</div>
 <div style="display:flex;align-items:center;gap:10px">
 <div id="my-ref-code-display" style="background:rgba(255,255,255,0.2);border-radius:10px;padding:10px 18px;font-size:24px;font-weight:800;color:#fff;letter-spacing:4px">------</div>
-<button onclick="copyRefCode()" style="background:#fff;color:#EF4444;border:none;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;font-size:13px">📋 কপি</button>
+<div style="display:flex;flex-direction:column;gap:6px">
+<button onclick="copyRefCode()" style="background:#fff;color:#EF4444;border:none;border-radius:10px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:13px">📋 কপি</button>
+<button onclick="shareRefCode()" style="background:rgba(255,255,255,0.2);color:#fff;border:1.5px solid #fff;border-radius:10px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:13px">📤 শেয়ার</button>
+</div>
 </div>
 <div style="color:rgba(255,255,255,0.85);font-size:12px;margin-top:8px">বন্ধুকে এই কোড দিন। রেজিস্ট্রেশনে ব্যবহার করলে তারা আপনার নেটওয়ার্কে যোগ হবে।</div>
 </div>
@@ -652,7 +677,104 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 
 <div class="page" id="hub-network">
 <div class="topbar"><button class="back-btn" onclick="gp('feature-hub')">← পিছে</button><div style="font-weight:700;font-size:15px">📡 নেটওয়ার্ক সার্ভিস</div><div></div></div>
-<div class="auth-body"><div class="info-box" style="text-align:center;padding:30px"><div style="font-size:40px">📡</div><div style="font-weight:700;font-size:16px;margin-top:10px">নেটওয়ার্ক সার্ভিস</div><div style="font-size:13px;color:var(--gray);margin-top:8px">শীঘ্রই আসছে!</div></div></div></div>
+<div class="auth-body">
+
+<div style="background:linear-gradient(135deg,#1877F2,#E1306C);border-radius:16px;padding:16px;margin-bottom:16px;text-align:center">
+<div style="color:#fff;font-weight:700;font-size:16px">সোশ্যাল মিডিয়া বুস্ট</div>
+<div style="color:rgba(255,255,255,0.85);font-size:12px;margin-top:4px">লাইক, ফলোয়ার, ভিউ কিনুন</div>
+</div>
+
+<!-- Platform buttons -->
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px">
+<div onclick="openNetworkPlatform('facebook')" style="background:#fff;border-radius:14px;padding:16px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);border:2px solid #E8F0FE">
+<div style="font-size:32px">📘</div>
+<div style="font-weight:700;margin-top:6px;color:#1877F2">Facebook</div>
+<div style="font-size:11px;color:var(--gray);margin-top:2px">লাইক • ফলো • শেয়ার</div>
+</div>
+<div onclick="openNetworkPlatform('instagram')" style="background:#fff;border-radius:14px;padding:16px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);border:2px solid #FDE8F5">
+<div style="font-size:32px">📸</div>
+<div style="font-weight:700;margin-top:6px;color:#E1306C">Instagram</div>
+<div style="font-size:11px;color:var(--gray);margin-top:2px">লাইক • ফলো • ভিউ</div>
+</div>
+<div onclick="openNetworkPlatform('tiktok')" style="background:#fff;border-radius:14px;padding:16px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);border:2px solid #F0F0F0">
+<div style="font-size:32px">🎵</div>
+<div style="font-weight:700;margin-top:6px;color:#000">TikTok</div>
+<div style="font-size:11px;color:var(--gray);margin-top:2px">লাইক • ফলো • ভিউ</div>
+</div>
+<div onclick="openNetworkPlatform('youtube')" style="background:#fff;border-radius:14px;padding:16px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);border:2px solid #FFE8E8">
+<div style="font-size:32px">▶️</div>
+<div style="font-weight:700;margin-top:6px;color:#FF0000">YouTube</div>
+<div style="font-size:11px;color:var(--gray);margin-top:2px">লাইক • সাবস্ক্রাইব • ভিউ</div>
+</div>
+</div>
+
+<!-- My orders -->
+<div class="card">
+<div style="font-weight:700;font-size:14px;margin-bottom:10px">📋 আমার অর্ডার</div>
+<div id="network-my-orders"><div style="text-align:center;padding:16px;color:var(--gray);font-size:13px">লোড হচ্ছে...</div></div>
+</div>
+
+</div></div>
+
+<!-- NETWORK ORDER DETAIL PAGE -->
+<div class="page" id="hub-network-order">
+<div class="topbar"><button class="back-btn" onclick="gp('hub-network')">← পিছে</button><div id="net-ord-title" style="font-weight:700;font-size:15px">অর্ডার করুন</div><div></div></div>
+<div class="auth-body">
+
+<div id="net-platform-banner" style="border-radius:14px;padding:16px;margin-bottom:14px;text-align:center"></div>
+
+<!-- Service type -->
+<div class="card">
+<div style="font-weight:700;font-size:14px;margin-bottom:10px">সার্ভিস বেছে নিন</div>
+<div id="net-service-btns" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+</div>
+
+<!-- Quantity -->
+<div class="card">
+<div style="font-weight:700;font-size:14px;margin-bottom:10px">পরিমাণ বেছে নিন</div>
+<div id="net-qty-btns" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"></div>
+</div>
+
+<!-- Link input -->
+<div class="card">
+<div class="fg"><label class="fl">আপনার পোস্ট/প্রোফাইল লিংক</label>
+<div class="fi-wrap"><span class="fi-icon">🔗</span><input type="url" class="fi" id="net-link" placeholder="https://..."></div></div>
+</div>
+
+<!-- Summary -->
+<div class="card" id="net-summary" style="display:none">
+<div style="font-weight:700;font-size:14px;margin-bottom:8px">অর্ডার সামারি</div>
+<div id="net-summary-text" style="font-size:13px;line-height:2"></div>
+</div>
+
+<!-- Payment -->
+<div class="card" id="net-payment-section" style="display:none">
+<div style="font-weight:700;font-size:14px;margin-bottom:10px">পেমেন্ট</div>
+<div class="info-box" style="margin-bottom:10px">bKash/Nagad করুন: <b style="color:var(--blue);font-size:16px">01615488003</b><br><span style="font-size:12px">পেমেন্টের পর নিচে তথ্য দিন</span></div>
+<div class="fg"><label class="fl">আপনার নম্বর</label><div class="fi-wrap"><span class="fi-icon">📱</span><input type="tel" class="fi" id="net-pay-num" placeholder="01XXXXXXXXX"></div></div>
+<div class="fg"><label class="fl">Transaction ID</label><div class="fi-wrap"><span class="fi-icon">🧾</span><input type="text" class="fi" id="net-trx" placeholder="TrxID"></div></div>
+</div>
+
+<button onclick="placeNetworkOrder()" style="width:100%;padding:14px;border:none;background:var(--blue);color:#fff;border-radius:12px;font-weight:700;cursor:pointer;font-size:15px;margin-top:4px">✅ অর্ডার নিশ্চিত করুন</button>
+
+</div></div>
+
+<!-- ADMIN NETWORK PAGE -->
+<div class="page" id="admin-network">
+<div class="topbar"><button class="back-btn" onclick="gp('admin')">← পিছে</button><div style="font-weight:700;font-size:15px">📡 নেটওয়ার্ক অর্ডার</div><div></div></div>
+<div class="auth-body">
+<div class="card">
+<div style="font-weight:700;font-size:14px;margin-bottom:12px">মূল্য সেটিং</div>
+<div id="net-price-settings"></div>
+<button onclick="saveNetworkPrices()" class="btn btn-p" style="margin-top:10px">💾 সেভ করুন</button>
+</div>
+<div class="card">
+<div style="font-weight:700;font-size:14px;margin-bottom:10px">সব অর্ডার</div>
+<div id="admin-network-orders"><div style="text-align:center;padding:20px;color:var(--gray)">লোড হচ্ছে...</div></div>
+</div>
+</div></div>
+
+
 
 <div class="page" id="hub-games">
 <div class="topbar"><button class="back-btn" onclick="gp('feature-hub')">← পিছে</button><div style="font-weight:700;font-size:15px">🎮 গেম</div><div></div></div>
@@ -680,7 +802,9 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 
 <!-- HUB DROPS PAGE -->
 <div class="page" id="hub-drops">
-<div class="topbar"><button class="back-btn" onclick="gp('home')">← পিছে</button><div style="font-weight:700;font-size:15px">💧 আমার ড্রপস</div><div></div></div>
+<div class="topbar"><button class="back-btn" onclick="gp('home')">← পিছে</button><div style="font-weight:700;font-size:15px">💧 আমার ড্রপস</div><div>
+<div id="drops-ad-slot" style="margin:8px 0"></div>
+</div></div>
 <div class="auth-body">
 
 <!-- Balance Card -->
@@ -737,6 +861,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="a-menu" onclick="gp('admin-ads')"><span>📢</span><div style="flex:1"><div style="font-weight:600">Ad ম্যানেজমেন্ট</div><div style="font-size:12px;color:var(--gray)">বিজ্ঞাপন নিয়ন্ত্রণ</div></div><span style="color:var(--gray)">›</span></div>
 <div class="a-menu" onclick="gp('admin-categories')"><span>📂</span><div style="flex:1"><div style="font-weight:600">ক্যাটাগরি ম্যানেজমেন্ট</div><div style="font-size:12px;color:var(--gray)">ক্যাটাগরি যোগ ও মুছুন</div></div><span style="color:var(--gray)">›</span></div>
 <div class="a-menu" onclick="gp('admin-blocked')"><span>🚫</span><div style="flex:1"><div style="font-weight:600">ব্লক করা ছবি</div><div style="font-size:12px;color:var(--gray)">AI আটকানো ছবি রিভিউ করুন</div></div><span class="ndot" id="blocked-dot" style="background:#EF4444;display:none"></span><span style="color:var(--gray)">›</span></div>
+<div class="a-menu" onclick="gp('admin-network')"><span>📡</span><div style="flex:1"><div style="font-weight:600">নেটওয়ার্ক অর্ডার</div><div style="font-size:12px;color:var(--gray)">মূল্য সেটিং ও অর্ডার</div></div><span style="color:var(--gray)">›</span></div>
 </div></div></div>
 
 <!-- ADMIN SUB PAGES -->
@@ -872,7 +997,10 @@ function gp(id,skipHistory){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   const el=document.getElementById(id);
   if(el){el.classList.add("active");window.scrollTo(0,0);}
-  if(id==="home")renderFeed();
+  if(id==="home"){
+    renderFeed();
+    injectAdBanner("home-ad-slot","small","shop");
+  }
   if(id==="shop"){loadShop("all");syncShopCategories();}
   if(id==="my-orders")loadMyOrders();
   if(id==="notifications")loadNotifs();
@@ -886,12 +1014,14 @@ function gp(id,skipHistory){
   if(id==="admin-ads")loadAds();
   if(id==="admin-categories")loadAdminCategories();
   if(id==="hub-refer")loadReferPage();
-  if(id==="hub-drops")loadDropsPage();
+  if(id==="hub-drops"){loadDropsPage();setTimeout(()=>injectAdBanner("drops-ad-slot","small","refer"),500);}
   if(id==="admin-withdrawals")loadWdReqs();
   if(id==="admin-blocked")loadBlockedImages();
+  if(id==="hub-network"){loadNetworkPage();}
+  if(id==="admin-network"){loadAdminNetwork();}
   if(id==="profile")loadMyPosts();
-  if(id==="explore")loadExplore();
-  if(id==="chat-list")loadChatList();
+  if(id==="explore"){loadExplore();injectAdBanner("explore-ad-slot","large","refer");}
+  if(id==="chat-list"){loadChatList();injectAdBanner("chatlist-ad-slot","small","shop");}
   if(id==="verify"){const vs=document.getElementById("verify-status");if(vs&&CUD&&CUD.verified)vs.innerHTML="<div style=\"text-align:center;padding:16px;background:#D1FAE5;border-radius:11px;color:#065F46;font-weight:700\">✅ আপনার অ্যাকাউন্ট ভেরিফাইড!</div>";}
   // Push to browser history so Android back button navigates pages instead of closing the app
   if(!skipHistory){
@@ -1421,8 +1551,112 @@ function renderFeed(){
   },()=>{c.innerHTML="<div style=\"text-align:center;padding:30px;color:var(--error)\">লোড হয়নি। আবার চেষ্টা করুন।</div>";});
 }
 
+// ===== AD BANNER SYSTEM =====
+// Adsterra codes
+const AD_NATIVE_SRC = "https://pl30118639.effectivecpmnetwork.com/c9cf3f48061b11f7075851264fcc3404/invoke.js";
+const AD_NATIVE_ID = "container-c9cf3f48061b11f7075851264fcc3404";
+const AD_320x50_KEY = "c1d5c37d3d359f715928b4100815564b";
+
+let _adCount = 0;
+
+function buildAdBanner(size, fallbackHtml){
+  _adCount++;
+  const uid = "adslot_"+_adCount;
+  const isLarge = size === "large";
+  const wrapStyle = isLarge
+    ? "margin:8px 12px;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.06)"
+    : "background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)";
+
+  const div = document.createElement("div");
+  div.style.cssText = wrapStyle;
+  div.innerHTML = "<div style='font-size:9px;color:#bbb;text-align:right;padding:2px 8px;letter-spacing:0.5px'>বিজ্ঞাপন</div>"
+    + "<div id='"+uid+"' style='min-height:"+(isLarge?"90":"50")+"px;display:flex;align-items:center;justify-content:center'>"
+    + "</div>";
+
+  // Try to inject Adsterra 320x50
+  setTimeout(()=>{
+    const slot = document.getElementById(uid);
+    if(!slot) return;
+    try{
+      const w = document.createElement("ins");
+      w.className = "adsbygoogle";
+      // Use Adsterra invoke approach
+      const s = document.createElement("script");
+      s.async = true;
+      window["atOptions"] = {key:AD_320x50_KEY, format:"iframe", height:50, width:320, params:{}};
+      s.src = "https://www.highperformanceformat.com/"+AD_320x50_KEY+"/invoke.js";
+      slot.appendChild(s);
+    }catch(e){}
+    // Fallback after 3s if empty
+    setTimeout(()=>{
+      const sl = document.getElementById(uid);
+      if(sl && sl.offsetHeight < 20){
+        sl.innerHTML = fallbackHtml;
+      }
+    }, 3000);
+  }, 300);
+
+  return div;
+}
+
+function getDefaultFallback(type){
+  const shopHtml="<div style=\"display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer\" onclick=\"gp('shop')\">"
+    +"<div style=\"font-size:24px\">🛍️</div>"
+    +"<div style=\"flex:1\"><div style=\"font-weight:700;font-size:13px\">Social Drop Shop</div>"
+    +"<div style=\"font-size:11px;color:var(--gray)\">নতুন পণ্য দেখুন</div></div>"
+    +"<div style=\"font-size:11px;color:var(--blue);font-weight:700\">দেখুন</div></div>";
+  const referHtml="<div style=\"display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer\" onclick=\"gp('hub-refer')\">"
+    +"<div style=\"font-size:24px\">🔗</div>"
+    +"<div style=\"flex:1\"><div style=\"font-weight:700;font-size:13px\">রেফার করুন, ড্রপস পান!</div>"
+    +"<div style=\"font-size:11px;color:var(--gray)\">বন্ধু আনুন, ৫০০ ড্রপস পান</div></div>"
+    +"<div style=\"font-size:11px;color:#F59E0B;font-weight:700\">রেফার</div></div>";
+  if(type==="refer")return referHtml;
+  return shopHtml;
+}
+
+function injectAdBanner(containerId, size, fallbackType){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  container.innerHTML = "";
+  const banner = buildAdBanner(size, getDefaultFallback(fallbackType));
+  container.appendChild(banner);
+}
+// ===== END AD SYSTEM =====
+
 function renderAdCard(){
-  return "<div class=\"ad-card\"><div class=\"ad-tag\">বিজ্ঞাপন</div><div class=\"ad-body\"><div class=\"ad-icon\">🛍️</div><div><div style=\"font-size:14px;font-weight:700\">Social Drop Shop</div><div style=\"font-size:12px;color:var(--gray)\">সেরা দামে হ্যান্ডমেড পণ্য</div></div></div><button class=\"ad-cta\" onclick=\"gp('shop')\">এখনই দেখুন →</button></div>";
+  // Unique ID for each ad slot so multiple ads don't conflict
+  const uid = "ad_"+Date.now()+"_"+Math.random().toString(36).slice(2,6);
+  // Try Adsterra Native Banner first, fallback to own promo
+  return "<div class=\"ad-card\" style=\"padding:0;overflow:hidden\">"
+    +"<div style=\"display:flex;justify-content:space-between;align-items:center;padding:8px 12px 4px;border-bottom:1px solid var(--border)\">"
+    +"<span style=\"font-size:10px;color:var(--gray);font-weight:600;letter-spacing:0.5px\">বিজ্ঞাপন</span>"
+    +"<span style=\"font-size:10px;color:var(--gray)\">Adsterra</span></div>"
+    +"<div id=\""+uid+"\" style=\"min-height:120px;display:flex;align-items:center;justify-content:center\">"
+    // Adsterra native container
+    +"<div id=\"container-c9cf3f48061b11f7075851264fcc3404-"+uid+"\"></div>"
+    +"</div>"
+    // Fallback - shows if Adsterra fails to load
+    +"<div id=\"fb_"+uid+"\" style=\"display:none\">"
+    +"<div class=\"ad-body\" onclick=\"gp('shop')\" style=\"cursor:pointer\">"
+    +"<div class=\"ad-icon\">🛍️</div>"
+    +"<div><div style=\"font-size:14px;font-weight:700\">Social Drop Shop</div>"
+    +"<div style=\"font-size:12px;color:var(--gray)\">সেরা দামে পণ্য কিনুন</div></div></div>"
+    +"<button class=\"ad-cta\" onclick=\"gp('shop')\">দেখুন →</button>"
+    +"</div>"
+    +"</div>";
+}
+
+// Check if Adsterra loaded, show fallback if not
+function checkAdFallback(uid){
+  setTimeout(()=>{
+    const container=document.getElementById("container-c9cf3f48061b11f7075851264fcc3404-"+uid);
+    const fb=document.getElementById("fb_"+uid);
+    const main=document.getElementById(uid);
+    if(container&&!container.innerHTML.trim()&&fb&&main){
+      main.style.display="none";
+      fb.style.display="block";
+    }
+  },3000);
 }
 
 function openPostMenu(postId,authorUid){
@@ -2764,7 +2998,10 @@ document.addEventListener("touchend",e=>{
     ptrEl.querySelector("div").style.animation="spin .7s linear infinite";
     const active=document.querySelector(".page.active");
     const id=active?active.id:"";
-    if(id==="home")renderFeed();
+    if(id==="home"){
+    renderFeed();
+    injectAdBanner("home-ad-slot","small","shop");
+  }
     else if(id==="shop")loadShop("all");
     else if(id==="my-orders")loadMyOrders();
     else if(id==="notifications")loadNotifs();
@@ -2840,6 +3077,193 @@ async function downloadCurProdImg(){
     toast("ছবি খুলুন → দীর্ঘক্ষণ চাপ দিন → গ্যালারিতে সেভ করুন","ok");
   }
 }
+
+// ===== NETWORK SERVICE =====
+const NET_PLATFORMS={
+  facebook:{name:"Facebook",icon:"F",color:"#1877F2",services:["লাইক","ফলো","শেয়ার"]},
+  instagram:{name:"Instagram",icon:"I",color:"#E1306C",services:["লাইক","ফলো","ভিউ"]},
+  tiktok:{name:"TikTok",icon:"T",color:"#000",services:["লাইক","ফলো","ভিউ"]},
+  youtube:{name:"YouTube",icon:"Y",color:"#FF0000",services:["লাইক","সাবস্ক্রাইব","ভিউ"]}
+};
+const NET_QTYS=[50,100,200,500,1000];
+let _netPlatform=null,_netService=null,_netQty=null,_netPrices={};
+
+async function loadNetworkPage(){
+  try{const doc=await db.collection("network_settings").doc("prices").get();if(doc.exists)_netPrices=doc.data();}catch(e){}
+  const el=document.getElementById("network-my-orders");
+  if(!el||!CU)return;
+  db.collection("network_orders").where("uid","==",CU.uid).get().then(snap=>{
+    if(snap.empty){el.innerHTML="<div style='text-align:center;padding:16px;color:var(--gray);font-size:13px'>এখনো কোনো অর্ডার নেই</div>";return;}
+    const docs=[...snap.docs].sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
+    el.innerHTML="";
+    const stMap={pending:"⏳ অপেক্ষায়",processing:"🔄 প্রক্রিয়াধীন",completed:"✅ সম্পন্ন",cancelled:"❌ বাতিল"};
+    const stColor={pending:"#F59E0B",processing:"#3B82F6",completed:"#10B981",cancelled:"#EF4444"};
+    docs.forEach(d=>{
+      const o=d.data();
+      el.innerHTML+="<div style='padding:10px 0;border-bottom:1px solid var(--border);font-size:13px'>"
+        +"<div style='display:flex;justify-content:space-between'><b>"+o.platform+" - "+o.service+" "+o.qty+"</b>"
+        +"<span style='color:"+(stColor[o.status]||"#888")+";font-weight:700;font-size:11px'>"+(stMap[o.status]||o.status)+"</span></div>"
+        +"<div style='color:var(--gray);font-size:12px'>৳"+o.price+"</div></div>";
+    });
+  }).catch(()=>{el.innerHTML="<div style='color:var(--error);text-align:center;padding:12px'>লোড হয়নি</div>";});
+}
+
+function openNetworkPlatform(platform){
+  _netPlatform=platform;_netService=null;_netQty=null;
+  const p=NET_PLATFORMS[platform];
+  const banner=document.getElementById("net-platform-banner");
+  if(banner){
+    banner.style.cssText="border-radius:14px;padding:16px;margin-bottom:14px;text-align:center;background:"+p.color+"22;border:2px solid "+p.color+"44";
+    banner.innerHTML="<div style='font-weight:700;font-size:20px;color:"+p.color+"'>"+p.name+"</div>";
+  }
+  const title=document.getElementById("net-ord-title");
+  if(title)title.textContent=p.name+" অর্ডার";
+  const sb=document.getElementById("net-service-btns");
+  if(sb){
+    sb.innerHTML="";
+    p.services.forEach(svc=>{
+      const btn=document.createElement("button");
+      btn.style.cssText="padding:10px 18px;border:2px solid "+p.color+";background:#fff;color:"+p.color+";border-radius:20px;font-weight:700;cursor:pointer;font-size:13px";
+      btn.textContent=svc;
+      btn.onclick=()=>{
+        _netService=svc;
+        sb.querySelectorAll("button").forEach(b=>{b.style.background="#fff";b.style.color=p.color;});
+        btn.style.background=p.color;btn.style.color="#fff";
+        renderNetQtys();
+      };
+      sb.appendChild(btn);
+    });
+  }
+  const qb=document.getElementById("net-qty-btns");if(qb)qb.innerHTML="";
+  const ns=document.getElementById("net-summary");if(ns)ns.style.display="none";
+  const np=document.getElementById("net-payment-section");if(np)np.style.display="none";
+  gp("hub-network-order");
+}
+
+function renderNetQtys(){
+  const p=NET_PLATFORMS[_netPlatform];
+  const qb=document.getElementById("net-qty-btns");
+  if(!qb||!_netService)return;
+  qb.innerHTML="";
+  NET_QTYS.forEach(qty=>{
+    const key=_netPlatform+"_"+_netService+"_"+qty;
+    const price=_netPrices[key]||(qty*0.5);
+    const btn=document.createElement("div");
+    btn.style.cssText="border:2px solid var(--border);border-radius:12px;padding:10px;text-align:center;cursor:pointer;background:#fff";
+    btn.innerHTML="<div style='font-weight:800;font-size:16px'>"+qty+"</div><div style='font-size:11px;color:var(--gray)'>"+price+"</div>";
+    btn.onclick=()=>{
+      _netQty=qty;
+      qb.querySelectorAll("div[style]").forEach(b=>{b.style.border="2px solid var(--border)";b.style.background="#fff";});
+      btn.style.border="2px solid "+p.color;btn.style.background=p.color+"11";
+      const ns=document.getElementById("net-summary");if(ns)ns.style.display="block";
+      const nt=document.getElementById("net-summary-text");
+      if(nt)nt.innerHTML="<b>প্ল্যাটফর্ম:</b> "+p.name+"<br><b>সার্ভিস:</b> "+_netService+"<br><b>পরিমাণ:</b> "+qty+"<br><b style='color:var(--blue)'>মূল্য: "+price+"</b>";
+      const nps=document.getElementById("net-payment-section");if(nps)nps.style.display="block";
+    };
+    qb.appendChild(btn);
+  });
+}
+
+async function placeNetworkOrder(){
+  if(!_netPlatform||!_netService||!_netQty){toast("সব তথ্য বেছে নিন!","er");return;}
+  const link=document.getElementById("net-link")?.value.trim();
+  const payNum=document.getElementById("net-pay-num")?.value.trim();
+  const trx=document.getElementById("net-trx")?.value.trim();
+  if(!link){toast("লিংক দিন!","er");return;}
+  if(!payNum||!trx){toast("পেমেন্ট তথ্য দিন!","er");return;}
+  const price=_netPrices[_netPlatform+"_"+_netService+"_"+_netQty]||(_netQty*0.5);
+  showL("অর্ডার হচ্ছে...");
+  try{
+    await db.collection("network_orders").add({
+      uid:CU.uid,username:CUD?.username||"",
+      platform:_netPlatform,service:_netService,qty:_netQty,
+      price,link,payNum,trx,status:"pending",
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    hideL();toast("✅ অর্ডার সফল!","ok");
+    sendNotif(CU.uid,"📡 অর্ডার নিশ্চিত!",NET_PLATFORMS[_netPlatform].name+" - "+_netService+" "+_netQty+" অর্ডার পেয়েছি");
+    gp("hub-network");
+  }catch(e){hideL();toast("সমস্যা হয়েছে!","er");}
+}
+
+async function loadAdminNetwork(){
+  const el=document.getElementById("net-price-settings");
+  if(!el)return;
+  try{const doc=await db.collection("network_settings").doc("prices").get();if(doc.exists)_netPrices=doc.data();}catch(e){}
+  el.innerHTML="";
+  Object.entries(NET_PLATFORMS).forEach(([pid,p])=>{
+    const sec=document.createElement("div");
+    sec.style.cssText="margin-bottom:14px;padding:12px;background:var(--bg);border-radius:10px";
+    sec.innerHTML="<div style='font-weight:700;margin-bottom:8px;color:"+p.color+"'>"+p.name+"</div>";
+    p.services.forEach(svc=>{
+      NET_QTYS.forEach(qty=>{
+        const key=pid+"_"+svc+"_"+qty;
+        const val=_netPrices[key]||"";
+        const row=document.createElement("div");
+        row.style.cssText="display:flex;align-items:center;gap:8px;margin-bottom:6px";
+        const lbl=document.createElement("div");lbl.style.cssText="flex:1;font-size:12px;color:var(--gray)";lbl.textContent=svc+" "+qty;
+        const inp=document.createElement("input");
+        inp.type="number";inp.id="np_"+key;inp.value=val;inp.placeholder="৳";
+        inp.style.cssText="width:80px;padding:6px;border:1.5px solid var(--border);border-radius:8px;font-size:12px";
+        row.appendChild(lbl);row.appendChild(inp);sec.appendChild(row);
+      });
+    });
+    el.appendChild(sec);
+  });
+  // Load orders
+  const oel=document.getElementById("admin-network-orders");
+  if(!oel)return;
+  db.collection("network_orders").get().then(snap=>{
+    if(snap.empty){oel.innerHTML="<div style='text-align:center;padding:20px;color:var(--gray)'>কোনো অর্ডার নেই</div>";return;}
+    const docs=[...snap.docs].sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
+    oel.innerHTML="";
+    docs.forEach(d=>{
+      const o=d.data();
+      const card=document.createElement("div");
+      card.style.cssText="border:1.5px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px";
+      const info=document.createElement("div");
+      info.innerHTML="<div style='display:flex;justify-content:space-between;margin-bottom:6px'><b>"+o.platform+" - "+o.service+" "+o.qty+"</b><b style='color:var(--blue)'>"+o.price+"</b></div>"
+        +"<div style='font-size:12px;color:var(--gray);margin-bottom:4px'>@"+(o.username||"")+"</div>"
+        +"<div style='font-size:12px;margin-bottom:4px'>"+o.link+"</div>"
+        +"<div style='font-size:12px;margin-bottom:8px'>"+o.payNum+" | "+o.trx+"</div>";
+      const btns=document.createElement("div");btns.style.cssText="display:flex;gap:6px";
+      [["processing","🔄","#3B82F6"],["completed","✅","#10B981"],["cancelled","❌","#EF4444"]].forEach(([st,lbl,clr])=>{
+        const b=document.createElement("button");
+        b.style.cssText="flex:1;padding:7px;border:none;background:"+clr+";color:#fff;border-radius:8px;font-weight:700;cursor:pointer;font-size:11px";
+        b.textContent=lbl+" "+st;
+        b.onclick=()=>{
+          showL("আপডেট হচ্ছে...");
+          db.collection("network_orders").doc(d.id).update({status:st}).then(()=>{
+            hideL();toast("✅ আপডেট!","ok");
+            sendNotif(o.uid,"📡 অর্ডার আপডেট",o.platform+" - "+o.service+" "+( st==="completed"?"সম্পন্ন":"আপডেট হয়েছে"));
+            loadAdminNetwork();
+          }).catch(()=>{hideL();toast("সমস্যা!","er");});
+        };
+        btns.appendChild(b);
+      });
+      card.appendChild(info);card.appendChild(btns);
+      oel.appendChild(card);
+    });
+  }).catch(()=>{oel.innerHTML="<div style='color:var(--error);text-align:center;padding:12px'>লোড হয়নি</div>";});
+}
+
+function saveNetworkPrices(){
+  const prices={};
+  Object.entries(NET_PLATFORMS).forEach(([pid,p])=>{
+    p.services.forEach(svc=>{
+      NET_QTYS.forEach(qty=>{
+        const key=pid+"_"+svc+"_"+qty;
+        const el=document.getElementById("np_"+key);
+        if(el&&el.value)prices[key]=parseFloat(el.value)||0;
+      });
+    });
+  });
+  showL("সেভ হচ্ছে...");
+  db.collection("network_settings").doc("prices").set(prices)
+    .then(()=>{hideL();_netPrices=prices;toast("✅ সেভ হয়েছে!","ok");})
+    .catch(()=>{hideL();toast("সমস্যা!","er");});
+}
+// ===== END NETWORK =====
 
 // ===== DROPS SYSTEM  =====
 function loadDropsPage(){
@@ -3005,39 +3429,27 @@ function renderRefList(users,gen){
 function copyRefCode(){
   const code=CUD&&CUD.refCode;
   if(!code){toast("কোড পাওয়া যায়নি","er");return;}
-  // Show options: copy code only OR copy full share message
-  const ov=document.createElement("div");
-  ov.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:flex-end;justify-content:center;padding:20px";
-  const box=document.createElement("div");
-  box.style.cssText="background:#fff;border-radius:18px;padding:18px;width:100%;max-width:400px";
-  box.innerHTML="<div style='font-weight:700;font-size:15px;margin-bottom:6px;text-align:center'>কী কপি করবেন?</div>"
-    +"<div style='font-size:13px;color:var(--gray);text-align:center;margin-bottom:14px'>কোড: <b style='font-size:18px;letter-spacing:3px;color:var(--blue)'>"+code+"</b></div>";
-  // Button 1: copy code only
-  const b1=document.createElement("button");
-  b1.style.cssText="width:100%;padding:13px;border:1.5px solid var(--blue);background:#fff;color:var(--blue);border-radius:12px;font-weight:700;cursor:pointer;font-size:14px;margin-bottom:8px";
-  b1.textContent="📋 শুধু কোড কপি করুন";
-  b1.onclick=()=>{
-    ov.remove();
-    doCopy(code, "✅ কোড কপি হয়েছে!");
-  };
-  // Button 2: copy full share message
-  const b2=document.createElement("button");
-  b2.style.cssText="width:100%;padding:13px;border:none;background:var(--blue);color:#fff;border-radius:12px;font-weight:700;cursor:pointer;font-size:14px;margin-bottom:8px";
-  b2.textContent="📤 শেয়ার মেসেজ কপি করুন";
-  b2.onclick=()=>{
-    ov.remove();
-    const msg="Social Drop App Refer Code: "+code+"\nhttps://social-drop-eight.vercel.app";
-    doCopy(msg, "✅ শেয়ার মেসেজ কপি হয়েছে!");
-  };
-  // Button 3: cancel
-  const b3=document.createElement("button");
-  b3.style.cssText="width:100%;padding:12px;border:none;background:var(--border);color:var(--gray);border-radius:12px;font-weight:700;cursor:pointer;font-size:14px";
-  b3.textContent="বাতিল";
-  b3.onclick=()=>ov.remove();
-  box.appendChild(b1);box.appendChild(b2);box.appendChild(b3);
-  ov.appendChild(box);
-  document.body.appendChild(ov);
-  ov.onclick=e=>{if(e.target===ov)ov.remove();};
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(code).then(()=>toast("✅ কোড কপি হয়েছে: "+code,"ok")).catch(()=>_fallbackCopy(code));
+  }else{_fallbackCopy(code);}
+}
+function _fallbackCopy(text){
+  const el=document.createElement("textarea");
+  el.value=text;el.style.cssText="position:fixed;opacity:0";
+  document.body.appendChild(el);el.focus();el.select();
+  try{document.execCommand("copy");toast("✅ কোড কপি হয়েছে!","ok");}
+  catch(e){toast("কপি হয়নি","er");}
+  document.body.removeChild(el);
+}
+function shareRefCode(){
+  const code=CUD&&CUD.refCode;
+  if(!code)return;
+  const msg="Social Drop App Refer Code: "+code+"\nhttps://social-drop-eight.vercel.app";
+  if(navigator.share){
+    navigator.share({title:"Social Drop",text:msg}).catch(()=>{});
+  }else if(navigator.clipboard){
+    navigator.clipboard.writeText(msg).then(()=>toast("✅ শেয়ার মেসেজ কপি হয়েছে!","ok"));
+  }
 }
 
 function doCopy(text, successMsg){
