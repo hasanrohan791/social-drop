@@ -262,15 +262,17 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="page" id="explore">
 <div class="topbar"><button class="back-btn" onclick="gp('home')">← পিছে</button><div style="font-weight:700;font-size:15px">🔍 খোঁজ</div><div></div></div>
 <div class="search-wrap"><span class="s-icon">🔍</span><input type="text" class="search-inp" placeholder="ইউজার খুঁজুন..." oninput="doSearch(this.value)" onblur="hideSearch()"><div class="s-results" id="s-results"></div></div>
-<div style="overflow-y:auto;padding-bottom:20px">
-<div class="ad-card" style="margin:10px 12px;border-radius:11px">
-  <div class="ad-tag">বিজ্ঞাপন</div>
-  <div style="width:100%;height:160px;background:linear-gradient(135deg,#1A73E8,#0D3B8C);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;border-radius:11px 11px 0 0">
-    <div style="font-size:40px">▶️</div>
-    <div style="font-size:13px;margin-top:6px;font-weight:600">ভিডিও বিজ্ঞাপন</div>
-  </div>
-  <div class="ad-body"><div class="ad-icon">🎬</div><div><div style="font-size:14px;font-weight:700">Social Drop Shop</div><div style="font-size:12px;color:var(--gray)">নতুন কালেকশন দেখুন</div></div></div>
-</div>
+<script>
+  atOptions = {
+    'key' : '3c40bd11e2d1cb317fa569bd0c1d6a41',
+    'format' : 'iframe',
+    'height' : 250,
+    'width' : 300,
+    'params' : {}
+  };
+</script>
+<script src="https://www.highperformanceformat.com/3c40bd11e2d1cb317fa569bd0c1d6a41/invoke.js"></script>
+
 <div class="post-grid" id="explore-grid"><div style="text-align:center;padding:40px;color:var(--gray);grid-column:span 3">লোড হচ্ছে...</div></div></div>
 </div>
 
