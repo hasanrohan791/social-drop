@@ -259,21 +259,30 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 </div></div>
 <div style="overflow-y:auto;padding-bottom:20px">
 
-<div style="text-align:center; margin:10px auto; width:100%; overflow:hidden;">
-  <script type="text/javascript">
-    atOptions = {
-      'key' : '3c40bd11e2d1cb317fa569bd0c1d6a41',
-      'format' : 'iframe',
-      'height' : 250,
-      'width' : 300,
-      'params' : {}
-    };
-  </script>
-  <script type="text/javascript" src="https://www.highperformanceformat.com/3c40bd11e2d1cb317fa569bd0c1d6a41/invoke.js"></script>
-</div>
-<div class="ad-card" ...>
-  </script>
-  <script type="text/javascript" src="https://www.highperformanceformat.com/3c40bd11e2d1cb317fa569bd0c1d6a41/invoke.js"></script>
+<!-- EXPLORE -->
+<div class="page" id="explore">
+  <div class="topbar">
+      <button class="back-btn" onclick="gp('home')">← পিছে</button>
+      <div style="font-weight:700;font-size:15px">🔍 খোঁজ</div>
+  </div>
+  
+  <div class="search-wrap">
+      <span class="s-icon">🔍</span>
+      <input type="text" class="search-inp" placeholder="ইউজার খুঁজুন..." oninput="doSearch(this.value)" onblur="hideSearch()">
+      <div class="s-results" id="s-results"></div>
+  </div>
+
+  <div style="overflow-y:auto;padding-bottom:20px">
+      <!-- বিজ্ঞাপনটি সার্চবারের নিচে বসবে -->
+      <div style="text-align:center; margin:10px auto; width:100%; overflow:hidden;">
+          <script type="text/javascript">
+            atOptions = {'key' : '3c40bd11e2d1cb317fa569bd0c1d6a41', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {}};
+          </script>
+          <script type="text/javascript" src="https://www.highperformanceformat.com/3c40bd11e2d1cb317fa569bd0c1d6a41/invoke.js"></script>
+      </div>
+
+      <div class="post-grid" id="explore-grid"></div>
+  </div>
 </div>
 <div class="page" id="create-post">
 <div class="topbar"><button class="back-btn" onclick="gp('home')">← পিছে</button><div style="font-weight:700;font-size:15px">নতুন পোস্ট</div><button class="post-btn-top" onclick="submitPost()">পোস্ট করুন</button></div>
