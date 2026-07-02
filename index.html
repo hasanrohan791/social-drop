@@ -184,19 +184,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 .toast.show{opacity:1;pointer-events:auto}
 .toast.ok{background:var(--success)}.toast.er{background:var(--error)}
 </style>
-<!-- Adsterra Native Banner -->
-<script async="async" data-cfasync="false" src="https://pl30118639.effectivecpmnetwork.com/c9cf3f48061b11f7075851264fcc3404/invoke.js"></script>
-<!-- Adsterra 320x50 Banner -->
-<script>
-  atOptions = {
-    'key' : 'c1d5c37d3d359f715928b4100815564b',
-    'format' : 'iframe',
-    'height' : 50,
-    'width' : 320,
-    'params' : {}
-  };
-</script>
-<script src="https://www.highperformanceformat.com/c1d5c37d3d359f715928b4100815564b/invoke.js"></script>
+
 </head>
 <body>
 
@@ -247,8 +235,6 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <button class="ibtn" onclick="gp('chat-list')">💬<span class="ndot" id="chat-dot"></span></button>
 <button class="ibtn" onclick="gp('notifications')">🔔<span class="ndot" id="ndot"></span></button>
 </div></div>
-<div id="home-ad-slot"></div>
-  
 <div class="feed" id="feed-container"><div style="text-align:center;padding:40px;color:var(--gray)">লোড হচ্ছে...</div></div>
 <div class="bnav">
 <button class="nbtn active" onclick="document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('active'));this.classList.add('active');gp('home')">🏠<span>হোম</span></button>
@@ -282,10 +268,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
       </div>
   </div>
 </div>
-          <script type="text/javascript">
-            atOptions = {'key' : '3c40bd11e2d1cb317fa569bd0c1d6a41', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {}};
-          </script>
-          <script type="text/javascript" src="https://www.highperformanceformat.com/3c40bd11e2d1cb317fa569bd0c1d6a41/invoke.js"></script>
+          
       </div>
 
       <div class="post-grid" id="explore-grid"></div>
@@ -1020,8 +1003,7 @@ function gp(id,skipHistory){
   if(el){el.classList.add("active");window.scrollTo(0,0);}
   if(id==="home"){
     renderFeed();
-    injectAdBanner("home-ad-slot","small","shop");
-  }
+}
   if(id==="shop"){loadShop("all");syncShopCategories();}
   if(id==="my-orders")loadMyOrders();
   if(id==="notifications")loadNotifs();
@@ -1561,7 +1543,6 @@ function renderFeed(){
     let cnt=0;
     snap.forEach(d=>{
       const p=d.data();
-      if(cnt>0&&cnt%10===0)c.innerHTML+=renderAdCard();
       const badge=bi(p.badge);
       const isLiked=likedPosts[d.id];
       const avHtml=p.profileImg?"<img src=\""+p.profileImg+"\" style=\"width:100%;height:100%;object-fit:cover;border-radius:50%\">":((p.name||"আ")[0]);
@@ -1576,49 +1557,9 @@ function renderFeed(){
 // Adsterra codes
 const AD_NATIVE_SRC = "https://pl30118639.effectivecpmnetwork.com/c9cf3f48061b11f7075851264fcc3404/invoke.js";
 const AD_NATIVE_ID = "container-c9cf3f48061b11f7075851264fcc3404";
-const AD_320x50_KEY = "c1d5c37d3d359f715928b4100815564b";
-
 let _adCount = 0;
 
-function buildAdBanner(size, fallbackHtml){
-  _adCount++;
-  const uid = "adslot_"+_adCount;
-  const isLarge = size === "large";
-  const wrapStyle = isLarge
-    ? "margin:8px 12px;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.06)"
-    : "background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)";
 
-  const div = document.createElement("div");
-  div.style.cssText = wrapStyle;
-  div.innerHTML = "<div style='font-size:9px;color:#bbb;text-align:right;padding:2px 8px;letter-spacing:0.5px'>বিজ্ঞাপন</div>"
-    + "<div id='"+uid+"' style='min-height:"+(isLarge?"90":"50")+"px;display:flex;align-items:center;justify-content:center'>"
-    + "</div>";
-
-  // Try to inject Adsterra 320x50
-  setTimeout(()=>{
-    const slot = document.getElementById(uid);
-    if(!slot) return;
-    try{
-      const w = document.createElement("ins");
-      w.className = "adsbygoogle";
-      // Use Adsterra invoke approach
-      const s = document.createElement("script");
-      s.async = true;
-      window["atOptions"] = {key:AD_320x50_KEY, format:"iframe", height:50, width:320, params:{}};
-      s.src = "https://www.highperformanceformat.com/"+AD_320x50_KEY+"/invoke.js";
-      slot.appendChild(s);
-    }catch(e){}
-    // Fallback after 3s if empty
-    setTimeout(()=>{
-      const sl = document.getElementById(uid);
-      if(sl && sl.offsetHeight < 20){
-        sl.innerHTML = fallbackHtml;
-      }
-    }, 3000);
-  }, 300);
-
-  return div;
-}
 
 function getDefaultFallback(type){
   const shopHtml="<div style=\"display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer\" onclick=\"gp('shop')\">"
@@ -1635,13 +1576,7 @@ function getDefaultFallback(type){
   return shopHtml;
 }
 
-function injectAdBanner(containerId, size, fallbackType){
-  const container = document.getElementById(containerId);
-  if(!container) return;
-  container.innerHTML = "";
-  const banner = buildAdBanner(size, getDefaultFallback(fallbackType));
-  container.appendChild(banner);
-}
+
 // ===== END AD SYSTEM =====
 
 function renderAdCard(){
@@ -3021,8 +2956,7 @@ document.addEventListener("touchend",e=>{
     const id=active?active.id:"";
     if(id==="home"){
     renderFeed();
-    injectAdBanner("home-ad-slot","small","shop");
-  }
+}
     else if(id==="shop")loadShop("all");
     else if(id==="my-orders")loadMyOrders();
     else if(id==="notifications")loadNotifs();
