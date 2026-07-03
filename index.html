@@ -168,6 +168,9 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 .a-menu{display:flex;align-items:center;gap:11px;padding:13px;background:#fff;border-radius:11px;margin-bottom:9px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.06);font-size:19px}
 .a-menu:active{transform:scale(0.98)}
 .vcard{background:#fff;border-radius:11px;padding:14px;margin-bottom:11px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.hub-lock-badge{display:none;position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.6);color:#fff;width:20px;height:20px;border-radius:50%;align-items:center;justify-content:center;font-size:11px;z-index:2}
+.hub-tile.locked{opacity:0.5;filter:grayscale(0.4)}
+.hub-tile.locked .hub-lock-badge{display:flex}
 .vdoc-img{width:100%;height:110px;object-fit:cover;border-radius:7px;margin-bottom:7px;background:var(--bg);cursor:pointer}
 .act-row{display:flex;gap:7px;margin-top:10px}
 .btn-ap{flex:1;padding:9px;background:var(--success);color:#fff;border:none;border-radius:9px;font-weight:700;cursor:pointer;font-size:13px}
@@ -461,7 +464,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="topbar"><button class="back-btn" onclick="gp('shop')">← পিছে</button><div style="font-weight:700;font-size:15px">পণ্যের বিবরণ</div><div></div></div>
 <div style="overflow-y:auto;padding-bottom:80px">
 <div style="position:relative;width:100%;background:var(--blue-light)">
-<div id="detail-img-slider" style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;min-height:270px;background:#f0f4f8"></div>
+<div id="detail-img-slider" style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;-webkit-overflow-scrolling:touch;min-height:270px;background:#f0f4f8"></div>
 <div id="detail-img-dots" style="display:flex;justify-content:center;gap:6px;padding:8px 0;position:absolute;bottom:8px;left:0;right:0"></div>
 <button id="dl-btn" onclick="downloadCurProdImg()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.55);color:#fff;border:none;border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600;display:none">⬇️ ডাউনলোড</button>
 </div>
@@ -577,10 +580,11 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
 
-<div onclick="gp('hub-support')" style="background:#fff;border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #EEF2FF">
+<div onclick="gp('hub-support')" class="hub-tile locked" data-feature="support" style="position:relative;background:#fff;border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #EEF2FF">
+<div class="hub-lock-badge">🔒</div>
 <div style="font-size:28px">🎧</div>
 <div style="font-size:12px;font-weight:700;margin-top:6px;color:#1e293b">সাপোর্ট</div>
-<div style="font-size:10px;color:#94a3b8;margin-top:2px">সাহায্য পান</div>
+<div style="font-size:10px;color:#94a3b8;margin-top:2px" class="hub-tile-sub">সাহায্য পান</div>
 </div>
 
 <div onclick="gp('hub-refer')" style="background:#fff;border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #FFF7ED">
@@ -601,28 +605,32 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div style="font-size:10px;color:#94a3b8;margin-top:2px">লাইক • ফলোয়ার</div>
 </div>
 
-<div onclick="gp('hub-games')" style="background:#fff;border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #FDF4FF">
+<div onclick="gp('hub-games')" class="hub-tile locked" data-feature="game" style="position:relative;background:#fff;border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #FDF4FF">
+<div class="hub-lock-badge">🔒</div>
 <div style="font-size:28px">🎮</div>
 <div style="font-size:12px;font-weight:700;margin-top:6px;color:#1e293b">গেম</div>
-<div style="font-size:10px;color:#94a3b8;margin-top:2px">খেলুন ও জিতুন</div>
+<div style="font-size:10px;color:#94a3b8;margin-top:2px" class="hub-tile-sub">খেলুন ও জিতুন</div>
 </div>
 
-<div onclick="gp('hub-lottery')" style="background:#fff;border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #FFFBEB">
+<div onclick="gp('hub-lottery')" class="hub-tile locked" data-feature="lottery" style="position:relative;background:#fff;border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #FFFBEB">
+<div class="hub-lock-badge">🔒</div>
 <div style="font-size:28px">🎰</div>
 <div style="font-size:12px;font-weight:700;margin-top:6px;color:#1e293b">লটারি</div>
-<div style="font-size:10px;color:#94a3b8;margin-top:2px">ভাগ্য পরীক্ষা</div>
+<div style="font-size:10px;color:#94a3b8;margin-top:2px" class="hub-tile-sub">ভাগ্য পরীক্ষা</div>
 </div>
 
-<div onclick="gp('hub-freelance')" style="background:#fff;border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #F0FDFA">
+<div onclick="gp('hub-freelance')" class="hub-tile locked" data-feature="freelance" style="position:relative;background:#fff;border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #F0FDFA">
+<div class="hub-lock-badge">🔒</div>
 <div style="font-size:28px">💻</div>
 <div style="font-size:12px;font-weight:700;margin-top:6px;color:#1e293b">ফ্রিল্যান্সিং শিখি</div>
-<div style="font-size:10px;color:#94a3b8;margin-top:2px">পেইড কোর্স</div>
+<div style="font-size:10px;color:#94a3b8;margin-top:2px" class="hub-tile-sub">পেইড কোর্স</div>
 </div>
 
-<div onclick="gp('hub-subscription')" style="background:#fff;border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #FFF1F2">
+<div onclick="gp('hub-subscription')" class="hub-tile locked" data-feature="subscription" style="position:relative;background:#fff;border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #FFF1F2">
+<div class="hub-lock-badge">🔒</div>
 <div style="font-size:28px">📦</div>
 <div style="font-size:12px;font-weight:700;margin-top:6px;color:#1e293b">সাবস্ক্রিপশন</div>
-<div style="font-size:10px;color:#94a3b8;margin-top:2px">CapCut • Canva++</div>
+<div style="font-size:10px;color:#94a3b8;margin-top:2px" class="hub-tile-sub">CapCut • Canva++</div>
 </div>
 
 </div>
@@ -924,6 +932,34 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="fg"><label class="fl">সর্বোচ্চ কতজন (ঐচ্ছিক)</label><div class="fi-wrap"><span class="fi-icon">👥</span><input type="number" class="fi" id="etk-limit" placeholder="খালি রাখলে সীমাহীন"></div></div>
 </div></div></div>
 
+<div class="page" id="admin-features">
+<div class="topbar"><button class="back-btn" onclick="gp('admin')">← পিছে</button><div style="font-weight:700;font-size:15px">🔒 ফিচার লক/আনলক</div><div></div></div>
+<div class="auth-body">
+<div class="info-box">💡 যেসব ফিচার এখনো তৈরি হয়নি, সেগুলো লক থাকলে ইউজাররা ট্যাপ করতে পারবে না — শুধু "শীঘ্রই আসছে" দেখাবে। তৈরি হয়ে গেলে আনলক করে দিন।</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+<div><div style="font-weight:700">🎧 সাপোর্ট</div></div>
+<button id="flk-support" onclick="toggleFeatureLock('support')" style="border:none;border-radius:20px;padding:8px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer">🔒 লকড</button>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+<div><div style="font-weight:700">🎮 গেম</div></div>
+<button id="flk-game" onclick="toggleFeatureLock('game')" style="border:none;border-radius:20px;padding:8px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer">🔒 লকড</button>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+<div><div style="font-weight:700">🎰 লটারি</div></div>
+<button id="flk-lottery" onclick="toggleFeatureLock('lottery')" style="border:none;border-radius:20px;padding:8px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer">🔒 লকড</button>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+<div><div style="font-weight:700">💻 ফ্রিল্যান্সিং শিখি</div></div>
+<button id="flk-freelance" onclick="toggleFeatureLock('freelance')" style="border:none;border-radius:20px;padding:8px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer">🔒 লকড</button>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0">
+<div><div style="font-weight:700">📦 সাবস্ক্রিপশন</div></div>
+<button id="flk-subscription" onclick="toggleFeatureLock('subscription')" style="border:none;border-radius:20px;padding:8px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer">🔒 লকড</button>
+</div>
+</div>
+</div></div>
+
 <div class="page" id="admin">
 <div class="topbar"><button class="back-btn" onclick="gp('profile')">← পিছে</button><div style="font-weight:700;font-size:15px">👑 Admin Panel</div><div></div></div>
 <div style="overflow-y:auto;padding-bottom:20px">
@@ -945,6 +981,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="a-menu" onclick="gp('admin-blocked')"><span>🚫</span><div style="flex:1"><div style="font-weight:600">ব্লক করা ছবি</div><div style="font-size:12px;color:var(--gray)">AI আটকানো ছবি রিভিউ করুন</div></div><span class="ndot" id="blocked-dot" style="background:#EF4444;display:none"></span><span style="color:var(--gray)">›</span></div>
 <div class="a-menu" onclick="gp('admin-network')"><span>📡</span><div style="flex:1"><div style="font-weight:600">নেটওয়ার্ক অর্ডার</div><div style="font-size:12px;color:var(--gray)">মূল্য সেটিং ও অর্ডার</div></div><span style="color:var(--gray)">›</span></div>
 <div class="a-menu" onclick="gp('admin-tasks')"><span>🎯</span><div style="flex:1"><div style="font-weight:600">ছোট কাজ ম্যানেজমেন্ট</div><div style="font-size:12px;color:var(--gray)">কাজ যোগ ও সাবমিশন রিভিউ</div></div><span class="ndot" id="task-pending-dot" style="background:#EF4444;display:none"></span><span style="color:var(--gray)">›</span></div>
+<div class="a-menu" onclick="gp('admin-features')"><span>🔒</span><div style="flex:1"><div style="font-weight:600">ফিচার লক/আনলক</div><div style="font-size:12px;color:var(--gray)">অসম্পূর্ণ ফিচার লুকান/দেখান</div></div><span style="color:var(--gray)">›</span></div>
 </div></div></div>
 
 <!-- ADMIN SUB PAGES -->
@@ -1100,6 +1137,9 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
 try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{});}catch(e){}
 // (CLOUD/PRESET defined in upload system above)
 let CU=null,CUD=null,selDocType="nid",selPay="cod",curProd=null,curPostId=null,chatUID=null,chatUnsub=null;
+// Unfinished features: locked by default until admin unlocks (or Firestore doc overrides)
+let FEATURE_LOCKS={support:true,game:true,lottery:true,freelance:true,subscription:true};
+const HUB_PAGE_TO_FEATURE={"hub-support":"support","hub-games":"game","hub-lottery":"lottery","hub-freelance":"freelance","hub-subscription":"subscription"};
 let likedPosts={},viewedPosts={};
 
 let _skipPush=false;
@@ -1110,6 +1150,12 @@ function gp(id,skipHistory){
     gp("login");
     return;
   }
+  // Block access to locked/unfinished features
+  const lockKey=HUB_PAGE_TO_FEATURE[id];
+  if(lockKey&&FEATURE_LOCKS[lockKey]){
+    toast("🔒 এই ফিচারটি শীঘ্রই আসছে!","er");
+    return;
+  }
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   const el=document.getElementById(id);
   if(el){el.classList.add("active");window.scrollTo(0,0);}
@@ -1118,6 +1164,8 @@ function gp(id,skipHistory){
     injectAdBanner("home-ad-slot","small","shop");
   }
   if(id==="shop"){loadShop("all");syncShopCategories();}
+  if(id==="feature-hub")loadFeatureLocks();
+  if(id==="admin-features")loadFeatureLocks();
   if(id==="my-orders")loadMyOrders();
   if(id==="notifications")loadNotifs();
   if(id==="wallet")updateWallet();
@@ -2353,7 +2401,7 @@ function openProduct(id){
       if(imgs.length>0){
         imgs.forEach((url,i)=>{
           const slide=document.createElement("div");
-          slide.style.cssText="min-width:100%;height:270px;scroll-snap-align:start;flex-shrink:0;background:#f0f4f8;display:flex;align-items:center;justify-content:center";
+          slide.style.cssText="min-width:100%;height:270px;scroll-snap-align:start;scroll-snap-stop:always;flex-shrink:0;background:#f0f4f8;display:flex;align-items:center;justify-content:center";
           // Loading placeholder
           const loader=document.createElement("div");
           loader.style.cssText="font-size:30px;opacity:0.4";
@@ -2775,6 +2823,41 @@ function unverifyUser(uid){
       .catch(()=>{hideL();toast("সমস্যা হয়েছে!","er");});
   });
 }
+// ===== FEATURE LOCK SYSTEM (hub items not yet built) =====
+function loadFeatureLocks(){
+  db.collection("settings").doc("feature_locks").get().then(doc=>{
+    if(doc.exists){
+      const d=doc.data();
+      Object.keys(FEATURE_LOCKS).forEach(k=>{if(typeof d[k]==="boolean")FEATURE_LOCKS[k]=d[k];});
+    }
+    applyFeatureLockUI();
+  }).catch(()=>applyFeatureLockUI());
+}
+function applyFeatureLockUI(){
+  document.querySelectorAll(".hub-tile[data-feature]").forEach(t=>{
+    const key=t.dataset.feature;
+    if(FEATURE_LOCKS[key])t.classList.add("locked");else t.classList.remove("locked");
+    const sub=t.querySelector(".hub-tile-sub");
+    if(sub){
+      if(!sub.dataset.orig)sub.dataset.orig=sub.textContent;
+      sub.textContent=FEATURE_LOCKS[key]?"শীঘ্রই আসছে":sub.dataset.orig;
+    }
+  });
+  Object.keys(FEATURE_LOCKS).forEach(k=>{
+    const btn=document.getElementById("flk-"+k);
+    if(!btn)return;
+    btn.textContent=FEATURE_LOCKS[k]?"🔒 লকড — আনলক করুন":"🔓 আনলকড — লক করুন";
+    btn.style.background=FEATURE_LOCKS[k]?"#EF4444":"#10B981";
+  });
+}
+function toggleFeatureLock(key){
+  const newState=!FEATURE_LOCKS[key];
+  showL("আপডেট হচ্ছে...");
+  db.collection("settings").doc("feature_locks").set({[key]:newState},{merge:true})
+    .then(()=>{FEATURE_LOCKS[key]=newState;hideL();toast(newState?"🔒 ফিচারটি লক করা হয়েছে":"🔓 ফিচারটি আনলক করা হয়েছে","ok");applyFeatureLockUI();})
+    .catch(()=>{hideL();toast("সমস্যা হয়েছে!","er");});
+}
+
 // ===== ছোট কাজ (MICRO TASKS) SYSTEM =====
 let curTaskId=null, curTaskData=null, tdProofFile=null;
 
