@@ -161,7 +161,19 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 .prod-name{font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .prod-price{font-size:15px;font-weight:800;color:var(--blue);margin-top:3px}
 .prod-stock{font-size:11px;color:var(--success);margin-top:2px}
-.msg-bubble{max-width:75%;padding:9px 13px;border-radius:17px;font-size:14px;line-height:1.5;margin-bottom:6px}
+.chat-item{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;transition:background 0.15s;border-bottom:1px solid #F3F4F6}
+.chat-item:active{background:#F3F4F6}
+.chat-item .av{flex-shrink:0}
+.chat-item-body{flex:1;min-width:0}
+.chat-item-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.chat-item-name{font-weight:700;font-size:14.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-item-time{font-size:11px;color:var(--gray);flex-shrink:0}
+.chat-item-msg{font-size:13px;color:var(--gray);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
+.chat-item.unread .chat-item-name{color:var(--text);font-weight:800}
+.chat-item.unread .chat-item-msg{color:var(--text);font-weight:600}
+.chat-item.unread .chat-item-time{color:var(--blue);font-weight:700}
+.chat-unread-dot{width:10px;height:10px;background:var(--blue);border-radius:50%;flex-shrink:0}
+.msg-bubble{max-width:75%;padding:9px 13px;border-radius:17px;font-size:14px;line-height:1.5;margin-bottom:2px}
 .msg-sent{background:var(--blue);color:#fff;border-bottom-right-radius:4px;align-self:flex-end;margin-left:auto}
 .msg-recv{background:#fff;color:var(--text);border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
 .a-stat{border-radius:11px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
@@ -203,6 +215,16 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 </head>
 <body>
 
+<!-- AD-BLOCKER / DNS-BLOCKER LOCK OVERLAY -->
+<div id="adblock-overlay" style="display:none;position:fixed;inset:0;z-index:999999;background:linear-gradient(135deg,#0F172A,#1E293B);color:#fff;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px">
+  <div style="font-size:56px;margin-bottom:14px">🚫</div>
+  <div style="font-size:19px;font-weight:800;margin-bottom:10px">বিজ্ঞাপন ব্লকার সনাক্ত হয়েছে</div>
+  <div style="font-size:13.5px;color:#CBD5E1;max-width:320px;line-height:1.8;margin-bottom:24px">
+    আপনার ফোনে Ad Blocker অথবা DNS-ভিত্তিক অ্যাড ব্লকিং (যেমন AdGuard DNS, NextDNS) চালু আছে।<br><br>
+    অ্যাপটি ব্যবহার করতে হলে অনুগ্রহ করে সেটি বন্ধ করুন। বিজ্ঞাপনই এই সেবা ফ্রি রাখতে সাহায্য করে।
+  </div>
+  <button onclick="recheckAdblock()" id="adblock-retry-btn" style="background:#3B82F6;color:#fff;border:none;padding:13px 30px;border-radius:30px;font-weight:700;font-size:14px;cursor:pointer">🔄 বন্ধ করেছি, আবার চেষ্টা করুন</button>
+</div>
 
 <!-- SPLASH -->
 <div class="page active" id="splash"><div class="splash-content"><div class="splash-logo">🛍️</div><div class="splash-title">Social <span>Drop</span></div><div class="splash-sub">পোস্ট করো • কেনো • আয় করো</div><div class="splash-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div></div>
@@ -303,7 +325,12 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <button class="type-btn active" onclick="document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">🌍 সবাই দেখবে</button>
 <button class="type-btn" onclick="document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">👥 ফলোয়াররা</button>
 </div></div>
-<div id="create-ad-slot" style="margin:12px 0 0"></div>
+<div id="create-ad-slot" style="margin:12px 0 0;text-align:center;overflow:hidden">
+  <script type="text/javascript">
+    atOptions = {'key' : '3c40bd11e2d1cb317fa569bd0c1d6a41', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {}};
+  </script>
+  <script type="text/javascript" src="https://www.highperformanceformat.com/3c40bd11e2d1cb317fa569bd0c1d6a41/invoke.js"></script>
+</div>
 </div></div>
 
 <!-- PROFILE -->
@@ -444,7 +471,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="topbar"><button class="back-btn" onclick="gp('chat-list')">← পিছে</button>
 <div style="display:flex;align-items:center;gap:8px"><div class="av" style="width:32px;height:32px;font-size:13px" id="chat-av">?</div><div style="font-weight:700;font-size:14px" id="chat-name">চ্যাট</div></div>
 <div></div></div>
-<div id="chat-msgs" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;padding:10px 14px 80px"></div>
+<div id="chat-msgs" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;padding:10px 14px 80px;background:var(--bg)"></div>
 <div style="position:fixed;bottom:0;left:0;right:0;padding:9px 11px;background:#fff;border-top:1px solid var(--border);display:flex;gap:7px;align-items:center">
 <input type="text" id="chat-input" class="fi" style="flex:1;padding:9px 13px" placeholder="মেসেজ লিখুন...">
 <button onclick="sendMsg()" style="width:42px;height:42px;border-radius:50%;background:var(--blue);border:none;color:#fff;font-size:17px;cursor:pointer">➤</button>
@@ -1140,6 +1167,65 @@ let CU=null,CUD=null,selDocType="nid",selPay="cod",curProd=null,curPostId=null,c
 // Unfinished features: locked by default until admin unlocks (or Firestore doc overrides)
 let FEATURE_LOCKS={support:true,game:true,lottery:true,freelance:true,subscription:true};
 const HUB_PAGE_TO_FEATURE={"hub-support":"support","hub-games":"game","hub-lottery":"lottery","hub-freelance":"freelance","hub-subscription":"subscription"};
+
+// ===== AD-BLOCKER / DNS-BLOCKER DETECTION =====
+let _adblockCheckBusy=false;
+function checkAdblock(){
+  if(_adblockCheckBusy)return;
+  _adblockCheckBusy=true;
+  let resolved=false,scriptBlocked=false;
+
+  // Bait element method: adblockers hide elements matching common ad-class patterns via CSS
+  const bait=document.createElement("div");
+  bait.className="adsbox ad-banner ads adsbygoogle banner-ad pub_300x250 text-ad textAd text_ad";
+  bait.style.cssText="position:absolute;top:-9999px;left:-9999px;width:5px;height:5px;";
+  document.body.appendChild(bait);
+
+  // Script-load method: try loading one of our real ad network scripts
+  const testScript=document.createElement("script");
+  testScript.src="https://www.highperformanceformat.com/c1d5c37d3d359f715928b4100815564b/invoke.js?cb="+Date.now();
+
+  function finish(){
+    if(resolved)return;resolved=true;
+    setTimeout(()=>{
+      let baitBlocked=false;
+      try{
+        baitBlocked=(bait.offsetParent===null)||bait.offsetHeight===0||bait.clientHeight===0||getComputedStyle(bait).display==="none"||getComputedStyle(bait).visibility==="hidden";
+      }catch(e){}
+      if(bait.parentNode)bait.parentNode.removeChild(bait);
+      if(testScript.parentNode)testScript.parentNode.removeChild(testScript);
+      _adblockCheckBusy=false;
+      if(baitBlocked||scriptBlocked)showAdblockOverlay();else hideAdblockOverlay();
+    },150);
+  }
+
+  testScript.onload=finish;
+  testScript.onerror=()=>{scriptBlocked=true;finish();};
+  document.body.appendChild(testScript);
+
+  // Safety timeout in case DNS-level blocking just silently hangs the request
+  setTimeout(()=>{if(!resolved){scriptBlocked=true;finish();}},2800);
+}
+function showAdblockOverlay(){
+  const ov=document.getElementById("adblock-overlay");
+  if(ov)ov.style.display="flex";
+  document.body.style.overflow="hidden";
+}
+function hideAdblockOverlay(){
+  const ov=document.getElementById("adblock-overlay");
+  if(ov)ov.style.display="none";
+  document.body.style.overflow="";
+}
+function recheckAdblock(){
+  const btn=document.getElementById("adblock-retry-btn");
+  if(btn){btn.textContent="⏳ চেক করা হচ্ছে...";btn.disabled=true;}
+  setTimeout(()=>{
+    checkAdblock();
+    if(btn){btn.textContent="🔄 বন্ধ করেছি, আবার চেষ্টা করুন";btn.disabled=false;}
+  },600);
+}
+window.addEventListener("load",()=>{setTimeout(checkAdblock,1200);});
+setInterval(checkAdblock,30000);
 let likedPosts={},viewedPosts={};
 
 let _skipPush=false;
@@ -1220,7 +1306,11 @@ function toast(m,t){
 function se(id,m,s){const el=document.getElementById(id);if(!el)return;if(s){el.textContent=m;el.classList.add("show");}else el.classList.remove("show");}
 function ce(ids){ids.forEach(id=>se(id,"",false));}
 function toggleEye(iid,btn){const i=document.getElementById(iid);i.type=i.type==="password"?"text":"password";btn.textContent=i.type==="password"?"👁️":"🙈";}
-function bi(b){return b==="blue"?"🔵":b==="gold"?"🟡":"";}
+function bi(b){
+  if(b==="blue")return "<svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" style=\"vertical-align:-3px;margin-left:1px\"><circle cx=\"12\" cy=\"12\" r=\"12\" fill=\"#3897F0\"/><path d=\"M7 12.5l3.2 3.2L17 8.5\" stroke=\"#fff\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>";
+  if(b==="gold")return "<svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" style=\"vertical-align:-3px;margin-left:1px\"><circle cx=\"12\" cy=\"12\" r=\"12\" fill=\"#F0B90B\"/><path d=\"M7 12.5l3.2 3.2L17 8.5\" stroke=\"#fff\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>";
+  return "";
+}
 function avBg(){return "linear-gradient(135deg,#1A73E8,#0D3B8C)";}
 function pickGallery(inputId){const i=document.getElementById(inputId);i.setAttribute("accept","image/*");i.click();}
 
@@ -1701,8 +1791,10 @@ function renderFeed(){
   const c=document.getElementById("feed-container");
   if(!c)return;
   c.innerHTML="<div style=\"text-align:center;padding:40px;color:var(--gray)\">লোড হচ্ছে...</div>";
+  _pendingFeedAds=[];
   db.collection("posts").orderBy("createdAt","desc").onSnapshot(snap=>{
     c.innerHTML="";
+    _pendingFeedAds=[];
     if(snap.empty){c.innerHTML="<div style=\"text-align:center;padding:40px;color:var(--gray)\">😊 কোনো পোস্ট নেই<br>প্রথম পোস্ট করুন!</div>";return;}
     let cnt=0;
     snap.forEach(d=>{
@@ -1713,8 +1805,48 @@ function renderFeed(){
       c.innerHTML+="<div class=\"post-card\"><div class=\"post-header\"><div class=\"av\" onclick=\"viewProfile('"+p.uid+"')\" style=\"cursor:pointer\">"+avHtml+"</div><div style=\"flex:1;cursor:pointer\" onclick=\"viewProfile('"+p.uid+"')\"><div class=\"post-uname\">"+p.name+" <span>"+badge+"</span></div><div class=\"post-time\">@"+p.username+" • 👁 "+(p.impressions||0)+"</div></div><button class=\"post-more\" onclick=\"openPostMenu('"+d.id+"','"+p.uid+"')\">⋯</button></div>"+(p.text?"<div class=\"post-text\">"+p.text+"</div>":"")+(p.imgUrl?"<img class=\"post-img\" src=\""+p.imgUrl+"\" loading=\"lazy\">":"")+"<div class=\"post-actions\"><button class=\"act-btn "+(isLiked?"liked":"")+"\" onclick=\"doLike(this,'"+d.id+"','"+p.uid+"')\"><span>"+(isLiked?"❤️":"🤍")+"</span> "+(p.likes||0)+"</button><button class=\"act-btn\" onclick=\"openComments('"+d.id+"')\"><span>💬</span> "+(p.comments||0)+"</button><button class=\"act-btn\"><span>👁</span> "+(p.impressions||0)+"</button></div></div>";
       if(!viewedPosts[d.id]){viewedPosts[d.id]=true;setTimeout(()=>trackImpression(d.id,p.uid),800);}
       cnt++;
+      if(cnt%5===0)c.innerHTML+=buildFeedAdCardHtml();
     });
+    setTimeout(flushPendingFeedAds,50);
   },()=>{c.innerHTML="<div style=\"text-align:center;padding:30px;color:var(--error)\">লোড হয়নি। আবার চেষ্টা করুন।</div>";});
+}
+
+// ===== IN-FEED NATIVE ADS (every 5 posts, rotating between different ad units so consecutive ads never look identical) =====
+const FEED_AD_UNITS=[
+  {html:"<script async data-cfasync=\"false\" src=\"https://pl30118639.effectivecpmnetwork.com/c9cf3f48061b11f7075851264fcc3404/invoke.js\"><\/script><div id=\"container-c9cf3f48061b11f7075851264fcc3404\"></div>",minHeight:140},
+  {html:"<script>atOptions={key:'3c40bd11e2d1cb317fa569bd0c1d6a41',format:'iframe',height:250,width:300,params:{}};<\/script><script src=\"https://www.highperformanceformat.com/3c40bd11e2d1cb317fa569bd0c1d6a41/invoke.js\"><\/script>",minHeight:260},
+  {html:"<script>atOptions={key:'c1d5c37d3d359f715928b4100815564b',format:'iframe',height:50,width:320,params:{}};<\/script><script src=\"https://www.highperformanceformat.com/c1d5c37d3d359f715928b4100815564b/invoke.js\"><\/script>",minHeight:60}
+];
+let _feedAdSeq=0,_pendingFeedAds=[];
+
+function buildFeedAdCardHtml(){
+  const unit=FEED_AD_UNITS[_feedAdSeq%FEED_AD_UNITS.length];
+  _feedAdSeq++;
+  const wrapId="feedad_"+_feedAdSeq;
+  _pendingFeedAds.push({wrapId,unit});
+  return "<div class=\"post-card\" style=\"padding:0;overflow:hidden\">"
+    +"<div style=\"display:flex;justify-content:space-between;align-items:center;padding:10px 14px 4px\">"
+    +"<div style=\"display:flex;align-items:center;gap:8px\"><div style=\"width:34px;height:34px;border-radius:50%;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:16px\">📢</div><div style=\"font-weight:700;font-size:13px;color:var(--text)\">স্পন্সরড</div></div>"
+    +"<div style=\"font-size:10px;color:#bbb\">বিজ্ঞাপন</div></div>"
+    +"<div id=\""+wrapId+"\" style=\"min-height:"+unit.minHeight+"px;display:flex;align-items:center;justify-content:center;padding:8px 0 12px\"></div></div>";
+}
+
+function flushPendingFeedAds(){
+  const batch=_pendingFeedAds;_pendingFeedAds=[];
+  batch.forEach(item=>{
+    const holder=document.getElementById(item.wrapId);
+    if(!holder)return;
+    try{
+      const ifr=document.createElement("iframe");
+      ifr.style.cssText="width:100%;height:"+item.unit.minHeight+"px;border:0;display:block";
+      ifr.scrolling="no";
+      holder.innerHTML="";holder.appendChild(ifr);
+      const doc=ifr.contentWindow.document;
+      doc.open();
+      doc.write("<!DOCTYPE html><html><head><style>body{margin:0;padding:0;overflow:hidden}</style></head><body>"+item.unit.html+"</body></html>");
+      doc.close();
+    }catch(e){}
+  });
 }
 
 // ===== AD BANNER SYSTEM =====
@@ -2250,8 +2382,12 @@ function loadMessages(){
   if(chatUnsub)chatUnsub();
   chatUnsub=db.collection("chats").doc(chatId).collection("messages").orderBy("createdAt","asc").onSnapshot(snap=>{
     c.innerHTML="";
-    if(snap.empty){c.innerHTML="<div style=\"text-align:center;padding:20px;color:var(--gray);font-size:13px\">কথোপকথন শুরু করুন</div>";return;}
-    snap.forEach(d=>{const m=d.data();const sent=m.senderId===CU.uid;c.innerHTML+="<div style=\"display:flex;flex-direction:column;align-items:"+(sent?"flex-end":"flex-start")+"\"><div class=\"msg-bubble "+(sent?"msg-sent":"msg-recv")+"\">"+m.text+"</div></div>";});
+    if(snap.empty){c.innerHTML="<div style=\"text-align:center;padding:20px;color:var(--gray);font-size:13px\">👋 কথোপকথন শুরু করুন</div>";return;}
+    snap.forEach(d=>{
+      const m=d.data();const sent=m.senderId===CU.uid;
+      const tStr=m.createdAt&&m.createdAt.toDate?m.createdAt.toDate().toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"}):"";
+      c.innerHTML+="<div style=\"display:flex;flex-direction:column;align-items:"+(sent?"flex-end":"flex-start")+";margin-bottom:8px\"><div class=\"msg-bubble "+(sent?"msg-sent":"msg-recv")+"\">"+m.text+"</div><div style=\"font-size:10px;color:var(--gray);margin:0 4px\">"+tStr+"</div></div>";
+    });
     c.scrollTop=c.scrollHeight;
   });
 }
@@ -2269,6 +2405,19 @@ function sendMsg(){
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&document.activeElement.id==="chat-input")sendMsg();});
 
 // ===== CHAT LIST (real conversations) =====
+function chatTimeFmt(ts){
+  if(!ts||!ts.toDate)return "";
+  const d=ts.toDate(),now=new Date(),diffMs=now-d,diffMin=Math.floor(diffMs/60000);
+  if(diffMin<1)return "এখন";
+  if(diffMin<60)return diffMin+"মি";
+  const diffHr=Math.floor(diffMin/60);
+  if(diffHr<24)return diffHr+"ঘ";
+  const diffDay=Math.floor(diffHr/24);
+  if(diffDay===1)return "গতকাল";
+  if(diffDay<7)return diffDay+"দিন";
+  return d.getDate()+"/"+(d.getMonth()+1);
+}
+
 function loadChatList(){
   if(!CU)return;
   const el=document.getElementById("chat-list-con");
@@ -2277,7 +2426,7 @@ function loadChatList(){
   db.collection("chatThreads").where("participants","array-contains",CU.uid).orderBy("updatedAt","desc").limit(30)
     .onSnapshot(snap=>{
       el.innerHTML="";
-      if(snap.empty){el.innerHTML="<div style=\"text-align:center;padding:30px;color:var(--gray)\">কোনো মেসেজ নেই</div>";return;}
+      if(snap.empty){el.innerHTML="<div style=\"text-align:center;padding:30px;color:var(--gray)\">💬 কোনো মেসেজ নেই<br><span style=\"font-size:12px\">নতুন কথোপকথন শুরু করুন</span></div>";return;}
       snap.forEach(d=>{
         const t=d.data();
         const otherUid=t.participants.find(p=>p!==CU.uid);
@@ -2285,7 +2434,16 @@ function loadChatList(){
         const oName=t[otherUid+"_name"]||"ইউজার";
         const oImg=t[otherUid+"_img"]||"";
         const avHtml=oImg?"<img src=\""+oImg+"\" style=\"width:100%;height:100%;object-fit:cover;border-radius:50%\">":oName[0];
-        el.innerHTML+="<div class=\"chat-item\" onclick=\"openChat('"+otherUid+"','"+oName.replace(/'/g,"")+"','"+oImg+"')\"><div class=\"av\" style=\"width:46px;height:46px;font-size:18px\">"+avHtml+"</div><div style=\"flex:1\"><div style=\"font-weight:700;font-size:14px\">"+oName+"</div><div style=\"font-size:12px;color:var(--gray)\">"+(t.lastMsg||"কথোপকথন শুরু করুন")+"</div></div></div>";
+        const seen=t[CU.uid+"_seen"]!==false;
+        const isMine=t.lastSender===CU.uid;
+        const preview=(isMine?"আপনি: ":"")+(t.lastMsg||"কথোপকথন শুরু করুন");
+        const timeStr=chatTimeFmt(t.updatedAt);
+        el.innerHTML+="<div class=\"chat-item"+(seen?"":" unread")+"\" onclick=\"openChat('"+otherUid+"','"+oName.replace(/'/g,"")+"','"+oImg+"')\">"+
+          "<div class=\"av\" style=\"width:50px;height:50px;font-size:19px\">"+avHtml+"</div>"+
+          "<div class=\"chat-item-body\">"+
+            "<div class=\"chat-item-top\"><span class=\"chat-item-name\">"+oName+"</span><span class=\"chat-item-time\">"+timeStr+"</span></div>"+
+            "<div style=\"display:flex;align-items:center;gap:6px\"><span class=\"chat-item-msg\" style=\"flex:1\">"+preview+"</span>"+(seen?"":"<span class=\"chat-unread-dot\"></span>")+"</div>"+
+          "</div></div>";
       });
     });
   loadActiveUsers();
@@ -2295,18 +2453,17 @@ function loadActiveUsers(){
   const el=document.getElementById("active-users-row");
   if(!el)return;
   const cutoff=new Date(Date.now()-15*60*1000);
-  db.collection("users").orderBy("lastActive","desc").limit(10).get().then(snap=>{
+  db.collection("users").where("lastActive",">",cutoff).orderBy("lastActive","desc").limit(20).get().then(snap=>{
     el.innerHTML="";
-    if(snap.empty){el.innerHTML="<div style=\"padding:10px;color:var(--gray);font-size:12px\">কেউ একটিভ নেই</div>";return;}
     let any=false;
     snap.forEach(d=>{
       if(CU&&d.id===CU.uid)return;
       const u=d.data();
       const avHtml=u.profileImg?"<img src=\""+u.profileImg+"\" style=\"width:100%;height:100%;object-fit:cover;border-radius:50%\">":(u.name&&u.name[0])||"?";
-      el.innerHTML+="<div class=\"story-item\" onclick=\"viewProfile('"+d.id+"')\"><div class=\"s-av\" style=\"background:none;padding:0;border:2px solid var(--success)\">"+avHtml+"</div><div class=\"s-name\">"+(u.name||"")+"</div></div>";
+      el.innerHTML+="<div class=\"story-item\" onclick=\"viewProfile('"+d.id+"')\"><div style=\"position:relative\"><div class=\"s-av\" style=\"background:none;padding:0;border:2px solid var(--border)\">"+avHtml+"</div><div style=\"position:absolute;bottom:2px;right:2px;width:13px;height:13px;background:var(--success);border-radius:50%;border:2px solid #fff\"></div></div><div class=\"s-name\">"+(u.name||"")+"</div></div>";
       any=true;
     });
-    if(!any)el.innerHTML="<div style=\"padding:10px;color:var(--gray);font-size:12px\">কেউ একটিভ নেই</div>";
+    if(!any)el.innerHTML="<div style=\"padding:14px;color:var(--gray);font-size:12px;width:100%;text-align:center\">🌙 এখন কেউ একটিভ নেই</div>";
   }).catch(()=>{el.innerHTML="<div style=\"padding:10px;color:var(--gray);font-size:12px\">লোড হয়নি</div>";});
 }
 
