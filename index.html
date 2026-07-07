@@ -198,6 +198,25 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(0);background:var(--text);color:#fff;padding:12px 20px;border-radius:14px;font-size:14px;font-weight:500;z-index:9999;white-space:normal;max-width:85vw;width:max-content;text-align:center;line-height:1.5;box-shadow:0 4px 16px rgba(0,0,0,0.25);opacity:0;pointer-events:none;transition:opacity .3s ease}
 .toast.show{opacity:1;pointer-events:auto}
 .toast.ok{background:var(--success)}.toast.er{background:var(--error)}
+
+/* ===== RAINY BEAR JACKPOT (watch-ad-to-earn wheel) ===== */
+.rb-task-box{background:rgba(255,255,255,0.95);border-radius:20px;padding:22px;box-shadow:0 10px 24px rgba(0,0,0,0.08)}
+.rb-task-box h3{color:#0369a1;font-size:18px;margin-bottom:8px;font-weight:700}
+.rb-task-box p{color:#334155;font-size:13.5px;margin-bottom:18px;line-height:1.7}
+.rb-premium-btn{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border:none;padding:14px 20px;font-size:15px;font-weight:700;border-radius:50px;cursor:pointer;width:100%;box-shadow:0 8px 20px rgba(2,132,199,0.4)}
+.rb-premium-btn:active{transform:scale(0.97)}
+.rb-premium-btn:disabled{opacity:0.55;cursor:not-allowed}
+.rb-fullscreen-ad-modal{display:none;position:fixed;inset:0;width:100vw;height:100vh;background:#000;z-index:999997;flex-direction:column;justify-content:flex-start;align-items:center}
+.rb-ad-top-bar{position:absolute;top:16px;width:100%;display:flex;justify-content:center;align-items:center;z-index:1000001}
+.rb-ad-timer-text{color:#fff;background:rgba(15,23,42,0.9);padding:8px 22px;border-radius:25px;font-size:14px;font-weight:600;border:1px solid rgba(255,255,255,0.15)}
+.rb-ad-close-cross{display:none;position:absolute;top:16px;right:20px;font-size:20px;font-weight:700;color:#fff;cursor:pointer;background:#ef4444;width:40px;height:40px;border-radius:50%;text-align:center;line-height:40px;z-index:1000002}
+.rb-ad-visible-area{width:100%;flex:1;display:flex;align-items:center;justify-content:center;background:#0f172a}
+.rb-lottery-modal{display:none;position:fixed;inset:0;width:100vw;height:100vh;background:radial-gradient(circle,#0f172a 0%,#075985 70%,#0284c7 100%);z-index:999996;flex-direction:column;justify-content:center;align-items:center;padding:20px}
+.rb-wheel-container{position:relative;width:270px;height:270px;margin:30px 0}
+.rb-wheel-pointer{position:absolute;top:-16px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:32px solid #ef4444;z-index:15}
+.rb-spin-trigger{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70px;height:70px;background:#fff;border-radius:50%;display:flex;flex-direction:column;justify-content:center;align-items:center;font-weight:700;font-size:13px;color:#0284c7;cursor:pointer;z-index:20;border:4px solid #38bdf8;box-shadow:0 0 25px rgba(0,0,0,0.3)}
+.rb-drop-particle{position:fixed;width:14px;height:20px;background:linear-gradient(180deg,#38bdf8,#0284c7);border-radius:0 100% 100% 100%;transform:rotate(45deg);pointer-events:none;z-index:999999;animation:rbFall 2.2s linear forwards}
+@keyframes rbFall{0%{transform:translateY(-50px) rotate(45deg) scale(0.6);opacity:0}15%{opacity:1}90%{opacity:1}100%{transform:translateY(105vh) rotate(45deg) scale(1.1);opacity:0}}
 </style>
 <!-- Adsterra Native Banner -->
 <script async="async" data-cfasync="false" src="https://pl30118639.effectivecpmnetwork.com/c9cf3f48061b11f7075851264fcc3404/invoke.js"></script>
@@ -500,7 +519,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div style="font-size:16px;font-weight:700;color:var(--blue);margin-top:5px" id="detail-price">৳ ০</div>
 <div style="font-size:13px;color:var(--gray);margin-top:3px" id="detail-stock">স্টক</div>
 <div style="margin-top:14px;font-size:14px;line-height:1.7;color:var(--text)" id="detail-desc">বিবরণ</div>
-
+<button onclick="copyProductDetails()" style="margin-top:10px;background:var(--blue-light);color:var(--blue);border:none;border-radius:20px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer">📋 কপি করুন</button>
 <div class="card" style="margin-top:16px;padding:16px">
 <h2 style="font-size:16px;margin-bottom:10px">💰 আপনার বিক্রয় দাম নির্ধারণ করুন</h2>
 <div class="fg"><label class="fl">আপনি কত টাকায় বিক্রি করবেন?</label>
@@ -658,6 +677,18 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div style="font-size:28px">📦</div>
 <div style="font-size:12px;font-weight:700;margin-top:6px;color:#1e293b">সাবস্ক্রিপশন</div>
 <div style="font-size:10px;color:#94a3b8;margin-top:2px" class="hub-tile-sub">CapCut • Canva++</div>
+</div>
+
+<div onclick="gp('hub-adearn')" style="background:#fff;border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #ECFDF5">
+<div style="font-size:28px">📚</div>
+<div style="font-size:12px;font-weight:700;margin-top:6px;color:#1e293b">বিজনেস টিপস</div>
+<div style="font-size:10px;color:#94a3b8;margin-top:2px">রিসেলিং টিপস</div>
+</div>
+
+<div onclick="gp('hub-jackpot')" style="background:#fff;border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #EFF6FF">
+<div style="font-size:28px">🐻</div>
+<div style="font-size:12px;font-weight:700;margin-top:6px;color:#1e293b">রেইনি বেয়ার জ্যাকপট</div>
+<div style="font-size:10px;color:#94a3b8;margin-top:2px">এ্যাড দেখে স্পিন করুন</div>
 </div>
 
 </div>
@@ -877,6 +908,56 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="topbar"><button class="back-btn" onclick="gp('feature-hub')">← পিছে</button><div style="font-weight:700;font-size:15px">📦 সাবস্ক্রিপশন অ্যাপ</div><div></div></div>
 <div class="auth-body"><div class="info-box" style="text-align:center;padding:30px"><div style="font-size:40px">📦</div><div style="font-weight:700;font-size:16px;margin-top:10px">সাবস্ক্রিপশন সার্ভিস</div><div style="font-size:13px;color:var(--gray);margin-top:8px">শীঘ্রই আসছে!</div></div></div></div>
 
+<!-- BUSINESS TIPS + ADS (content page, no reward tied to ad viewing — safe & policy-compliant) -->
+<div class="page" id="hub-adearn">
+<div class="topbar"><button class="back-btn" onclick="gp('feature-hub')">← পিছে</button><div style="font-weight:700;font-size:15px">📚 বিজনেস টিপস</div><div></div></div>
+<div class="auth-body">
+<div id="tips-ad-top" style="margin-bottom:14px;text-align:center;overflow:hidden;min-height:60px"></div>
+<div class="card">
+<div style="font-size:12px;color:var(--blue);font-weight:700;margin-bottom:8px">💡 আজকের টিপ</div>
+<div id="daily-tip-text" style="font-size:15px;color:var(--text);line-height:1.9;font-weight:600">লোড হচ্ছে...</div>
+<div style="font-size:11px;color:var(--gray);margin-top:14px;text-align:right" id="tip-date-label"></div>
+</div>
+<div style="text-align:center;margin:14px 0;font-size:12px;color:var(--gray)">👇 আরও টিপস দেখুন</div>
+<div id="tip-list-more"></div>
+<div id="tips-ad-bottom" style="margin-top:14px;text-align:center;overflow:hidden;min-height:250px"></div>
+</div></div>
+
+<!-- Adsterra Social Bar (floats its own UI, doesn't need manual placement) -->
+<script src="https://pl30227578.effectivecpmnetwork.com/61/3a/c9/613ac9693a0f668d55ca4ddfc1b65af9.js"></script>
+
+<!-- RAINY BEAR JACKPOT — full-screen ad + timer + lottery wheel -->
+<div class="page" id="hub-jackpot">
+<div class="topbar"><button class="back-btn" onclick="gp('feature-hub')">← পিছে</button><div style="font-weight:700;font-size:15px">🐻 রেইনি বেয়ার জ্যাকপট</div><div></div></div>
+<div class="auth-body">
+<div class="rb-task-box">
+<h3>🎰 লাকি ড্রপস স্পিন</h3>
+<p>১ মিনিট স্পন্সরড এ্যাড দেখুন, তারপর ভাল্লুকের চাকা ঘুরিয়ে ৫–২০ 💧 ড্রপস জিতে নিন!</p>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:13px;color:var(--gray)"><span>আজকে খেলেছেন</span><span id="ae-today-count" style="font-weight:800;color:var(--blue)">0/5</span></div>
+<button class="rb-premium-btn" id="ae-watch-btn" onclick="startAdTask()">🎬 মিশন শুরু করুন</button>
+<div style="font-size:11.5px;color:var(--gray);text-align:center;margin-top:12px">💡 এ্যাড শেষ পর্যন্ত না দেখলে চাকা ঘোরাতে পারবেন না</div>
+</div>
+</div></div>
+
+<!-- 📺 FULLSCREEN AD MODAL -->
+<div id="fullscreenAd" class="rb-fullscreen-ad-modal">
+  <div class="rb-ad-top-bar"><div id="adTimer" class="rb-ad-timer-text">অপেক্ষা করুন: ৬০ সেকেন্ড</div></div>
+  <div id="crossBtn" class="rb-ad-close-cross" onclick="handleAdClose()">✕</div>
+  <div class="rb-ad-visible-area" id="rb-ad-visible-area"></div>
+  <iframe id="rb-hidden-tracker" src="about:blank" style="width:1px;height:1px;border:0;position:absolute;bottom:0;right:0;opacity:0.01"></iframe>
+</div>
+
+<!-- 🎰 LOTTERY WHEEL MODAL -->
+<div id="lotteryModal" class="rb-lottery-modal">
+  <h2 id="lotteryTitle" style="color:#fff;text-shadow:0 4px 15px rgba(0,0,0,0.4);text-align:center;font-size:20px">🐻 ভাল্লুকের চাকাটি ঘুরান!</h2>
+  <div class="rb-wheel-container">
+    <div class="rb-wheel-pointer"></div>
+    <canvas id="rbWheel" width="270" height="270"></canvas>
+    <div id="spinBtn" class="rb-spin-trigger" onclick="spinTheWheel()"><span style="font-size:26px">🐻</span><span>SPIN</span></div>
+  </div>
+  <button id="finishBtn" class="rb-premium-btn" style="display:none;max-width:260px;background:linear-gradient(135deg,#10b981,#059669)" onclick="finishAdTask()">পুরস্কার নিয়ে ড্যাশবোর্ডে ফিরুন</button>
+</div>
+
 <!-- ADMIN BLOCKED IMAGES -->
 <div class="page" id="admin-blocked">
 <div class="topbar"><button class="back-btn" onclick="gp('admin')">← পিছে</button><div style="font-weight:700;font-size:15px">🚫 ব্লক করা ছবি</div><div></div></div>
@@ -987,6 +1068,16 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 </div>
 </div></div>
 
+<div class="page" id="admin-jackpot">
+<div class="topbar"><button class="back-btn" onclick="gp('admin')">← পিছে</button><div style="font-weight:700;font-size:15px">🐻 জ্যাকপট সেটিংস</div><div></div></div>
+<div class="auth-body">
+<div class="info-box">💡 প্রতিবার চাকা ঘুরিয়ে ৫, ৭, ১০, ১২, ১৫, ১৭, বা ২০ 💧 ড্রপস জিততে পারবে (এলোমেলোভাবে, ১৭ ও ২০-এর সম্ভাবনা কম রাখা)।</div>
+<div class="card">
+<div class="fg"><label class="fl">দৈনিক সর্বোচ্চ কতবার খেলতে পারবে</label><div class="fi-wrap"><span class="fi-icon">🎰</span><input type="number" class="fi" id="aer-limit" placeholder="5"></div></div>
+<div class="fg"><label class="fl">এ্যাড দেখার বাধ্যতামূলক সময় (সেকেন্ড)</label><div class="fi-wrap"><span class="fi-icon">⏱</span><input type="number" class="fi" id="aer-duration" placeholder="60"></div></div>
+<button class="btn btn-p" onclick="saveAdEarnConfig()">সেভ করুন</button>
+</div></div></div>
+
 <div class="page" id="admin">
 <div class="topbar"><button class="back-btn" onclick="gp('profile')">← পিছে</button><div style="font-weight:700;font-size:15px">👑 Admin Panel</div><div></div></div>
 <div style="overflow-y:auto;padding-bottom:20px">
@@ -1009,6 +1100,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="a-menu" onclick="gp('admin-network')"><span>📡</span><div style="flex:1"><div style="font-weight:600">নেটওয়ার্ক অর্ডার</div><div style="font-size:12px;color:var(--gray)">মূল্য সেটিং ও অর্ডার</div></div><span style="color:var(--gray)">›</span></div>
 <div class="a-menu" onclick="gp('admin-tasks')"><span>🎯</span><div style="flex:1"><div style="font-weight:600">ছোট কাজ ম্যানেজমেন্ট</div><div style="font-size:12px;color:var(--gray)">কাজ যোগ ও সাবমিশন রিভিউ</div></div><span class="ndot" id="task-pending-dot" style="background:#EF4444;display:none"></span><span style="color:var(--gray)">›</span></div>
 <div class="a-menu" onclick="gp('admin-features')"><span>🔒</span><div style="flex:1"><div style="font-weight:600">ফিচার লক/আনলক</div><div style="font-size:12px;color:var(--gray)">অসম্পূর্ণ ফিচার লুকান/দেখান</div></div><span style="color:var(--gray)">›</span></div>
+<div class="a-menu" onclick="gp('admin-jackpot')"><span>🐻</span><div style="flex:1"><div style="font-weight:600">রেইনি বেয়ার জ্যাকপট সেটিংস</div><div style="font-size:12px;color:var(--gray)">দৈনিক লিমিট ও সময়</div></div><span style="color:var(--gray)">›</span></div>
 </div></div></div>
 
 <!-- ADMIN SUB PAGES -->
@@ -1252,6 +1344,12 @@ function gp(id,skipHistory){
   if(id==="shop"){loadShop("all");syncShopCategories();}
   if(id==="feature-hub")loadFeatureLocks();
   if(id==="admin-features")loadFeatureLocks();
+  if(id==="hub-adearn")loadTipsPage();
+  if(id==="hub-jackpot")loadJackpotPage();
+  if(id==="admin-jackpot"){loadAdEarnConfig(()=>{
+    document.getElementById("aer-limit").value=_adEarnConfig.dailyLimit;
+    document.getElementById("aer-duration").value=_adEarnConfig.adDuration;
+  });}
   if(id==="my-orders")loadMyOrders();
   if(id==="notifications")loadNotifs();
   if(id==="wallet")updateWallet();
@@ -3268,6 +3366,289 @@ function rejectTaskSub(subId,uid){
   });
 }
 
+// ===== বিজনেস টিপস (content + ads page — no reward tied to ad viewing) =====
+const BUSINESS_TIPS=[
+"প্রোডাক্টের ছবি সবসময় প্রাকৃতিক আলোতে তুলুন — এতে রঙ স্পষ্ট দেখা যায় আর ক্রেতার আস্থা বাড়ে।",
+"প্রতিটা পোস্টে দাম স্পষ্ট করে লিখুন। দাম লুকালে অনেক ক্রেতা মেসেজ না করেই চলে যায়।",
+"ক্রেতার মেসেজের রিপ্লাই যত দ্রুত দিবেন, বিক্রি হওয়ার সম্ভাবনা তত বাড়বে — ৫ মিনিটের মধ্যে রিপ্লাই দেওয়ার চেষ্টা করুন।",
+"একই প্রোডাক্টের কয়েক অ্যাঙ্গেল থেকে ছবি দিন (সামনে, পাশ থেকে, ব্যবহারের দৃশ্যে) — এতে বিশ্বাসযোগ্যতা বাড়ে।",
+"রিভিউ/প্রশংসাপত্র (টেস্টিমোনিয়াল) পোস্ট করুন। নতুন ক্রেতারা অন্যের অভিজ্ঞতা দেখে সাহস পায়।",
+"ডেলিভারির সময় প্যাকেজিং সুন্দর রাখুন — এটা ক্রেতাকে আবার অর্ডার করতে উৎসাহ দেয়।",
+"একটা নির্দিষ্ট নিশ (niche) বেছে নিন। সবকিছু বিক্রি করার চেষ্টা না করে একটা ক্যাটাগরিতে ভালো করুন।",
+"অফার/ডিসকাউন্ট সীমিত সময়ের জন্য দিন ('আজ রাত পর্যন্ত') — এতে ক্রেতা দ্রুত সিদ্ধান্ত নেয়।",
+"কাস্টমারের অভিযোগ পেলে রাগ না করে দ্রুত সমাধান দিন — একজন সন্তুষ্ট কাস্টমার আরও ১০ জন কাস্টমার নিয়ে আসে।",
+"প্রতিদিন একই সময়ে পোস্ট করার অভ্যাস করুন — নিয়মিত পোস্ট করলে ফলোয়াররা অভ্যস্ত হয়ে যায়।",
+"প্রোডাক্টের ভিডিও বানান (আনবক্সিং বা ব্যবহার দেখিয়ে) — ছবির চেয়ে ভিডিওতে মানুষ বেশি বিশ্বাস করে।",
+"হোলসেল রেটে কিনে রিটেল প্রাইসে বিক্রি করার আগে প্রতিযোগীদের দাম যাচাই করে নিন।",
+"অর্ডার কনফার্ম করার আগে ঠিকানা ও ফোন নম্বর দুইবার যাচাই করুন — এতে রিটার্ন কমবে।",
+"ক্যাশ অন ডেলিভারির পাশাপাশি অগ্রিম পেমেন্ট অপশনও রাখুন, দুই ধরনের কাস্টমারই পাবেন।",
+"স্টক শেষ হওয়ার আগেই নতুন অর্ডার দিন — 'স্টক নাই' বলে কাস্টমার হারানো থেকে বাঁচুন।",
+"ফলোয়ারদের সাথে গল্পের মতো (স্টোরি) যোগাযোগ রাখুন — শুধু বিক্রির পোস্ট না দিয়ে মাঝে মাঝে ব্যক্তিগত আপডেটও দিন।",
+"প্রোডাক্টের সাইজ/মাপ/উপকরণ স্পষ্ট করে লিখুন — অস্পষ্ট তথ্য থাকলে রিটার্নের হার বেড়ে যায়।",
+"একজন কাস্টমার কিছু কিনলে তাকে ধন্যবাদ মেসেজ পাঠান — এটা ছোট কাজ কিন্তু বড় পার্থক্য তৈরি করে।",
+"প্রতিযোগীদের পেজ ফলো করুন, তারা কী নতুন করছে তা থেকে শিখুন, কিন্তু হুবহু কপি করবেন না।",
+"রিটার্ন/এক্সচেঞ্জ পলিসি স্পষ্ট করে লিখে রাখুন — এতে ক্রেতা নিশ্চিন্তে অর্ডার করতে পারে।",
+"একবারে অনেক প্রোডাক্ট পোস্ট না করে দিনে ২-৩টা ভালো মানের পোস্ট দিন।",
+"কাস্টমারকে জিজ্ঞেস করুন তারা কী চায় — পোল/প্রশ্ন পোস্ট করে ফলোয়ারদের মতামত নিন।",
+"প্যাকেজের ভিতরে একটা ছোট ধন্যবাদ কার্ড বা ডিসকাউন্ট কুপন দিন পরের অর্ডারের জন্য।",
+"হ্যাশট্যাগ ব্যবহার করুন প্রাসঙ্গিক বিষয়ে — এতে নতুন মানুষ আপনার পোস্ট খুঁজে পাবে।",
+"নিজের ব্র্যান্ড নাম/লোগো ছোট করে হলেও ছবিতে রাখুন — মানুষ মনে রাখতে সুবিধা হয়।",
+"যারা আগে কিনেছে তাদের আবার মনে করিয়ে দিন নতুন প্রোডাক্ট এলে — পুরনো কাস্টমার সহজে বিশ্বাস করে।",
+"দামে দরাদরি করলে বিরক্ত না হয়ে বিনয়ের সাথে ব্যাখ্যা করুন কেন এই দাম যৌক্তিক।",
+"ছবি তোলার সময় পরিষ্কার, ঝকঝকে ব্যাকগ্রাউন্ড ব্যবহার করুন — এলোমেলো ব্যাকগ্রাউন্ড প্রফেশনাল লাগে না।",
+"একটা এক্সেল/খাতায় প্রতিদিনের অর্ডার-খরচ-লাভ হিসাব রাখুন — ব্যবসা বড় করতে হলে হিসাব জানা জরুরি।",
+"কাস্টমারের প্রশ্নের উত্তর দেওয়ার সময় ইমোজি/বন্ধুত্বপূর্ণ ভাষা ব্যবহার করুন, রোবটের মতো উত্তর না দিয়ে।",
+"সিজনাল প্রোডাক্ট (ঈদ, শীতকাল ইত্যাদি) আগে থেকে স্টক করে রাখুন, শেষ মুহূর্তে দাম বেড়ে যায়।",
+"একটা প্রোডাক্টের সাথে ছোট আরেকটা প্রোডাক্ট ফ্রি/ছাড়ে অফার করুন (bundle) — গড় অর্ডার ভ্যালু বাড়ে।",
+"ফলোয়ার কম থাকলেও হতাশ হবেন না — মানসম্মত কনটেন্ট দিতে থাকলে ধীরে ধীরে বাড়বে।",
+"গ্রুপ/কমিউনিটিতে যোগ দিয়ে সেখানে সম্পর্ক তৈরি করুন, শুধু বিজ্ঞাপন না দিয়ে সাহায্যও করুন।",
+"অর্ডার ডেলিভারির পর ফিডব্যাক চান — নেগেটিভ ফিডব্যাক থেকেও শেখার সুযোগ আছে।",
+"একই দামে দুইটা ভিন্ন কালার/ডিজাইন অফার করুন — কাস্টমারকে অপশন দিলে সিদ্ধান্ত নেওয়া সহজ হয়।",
+"প্রোডাক্ট বর্ণনায় শুধু ফিচার না লিখে, এটা ব্যবহারে কী সুবিধা পাবে সেটাও লিখুন।",
+"নিয়মিত প্রতিযোগী বিশ্লেষণ করুন — বাজারে দাম আর ট্রেন্ড বদলায়, আপডেট থাকা জরুরি।",
+"পেমেন্ট নেওয়ার আগে সবসময় স্ক্রিনশট/রিসিট রাখুন — ভবিষ্যতে সমস্যা হলে প্রমাণ থাকবে।",
+"কাস্টমার সার্ভিসে ধৈর্য রাখুন — একই প্রশ্ন বারবার এলেও বিরক্তি প্রকাশ করবেন না।",
+"লাইভ ভিডিওতে প্রোডাক্ট দেখান — লাইভে মানুষ সরাসরি প্রশ্ন করতে পারে, বিশ্বাস দ্রুত তৈরি হয়।",
+"ছোট থেকে শুরু করুন, একসাথে অনেক টাকা বিনিয়োগ না করে ধীরে ধীরে বাড়ান।",
+"ডেলিভারি চার্জ স্পষ্ট করে আগেই বলুন — শেষ মুহূর্তে চার্জ যোগ করলে কাস্টমার বিরক্ত হয়।",
+"নিজের কাজের সময়সূচি ঠিক রাখুন — কখন অর্ডার নেন, কখন ডেলিভারি দেন তা ফলোয়ারদের জানিয়ে রাখুন।",
+"একজন কাস্টমারকে অন্য কাস্টমারের রেফারেন্স দিন (অনুমতি নিয়ে) — সামাজিক প্রমাণ বিক্রি বাড়ায়।",
+"প্রোডাক্ট ফটোর সাথে দামের কার্ড/ওভারলে যোগ করুন যাতে স্ক্রিনশট নিলেও দাম বোঝা যায়।",
+"বছরের বিশেষ দিনগুলো (মা দিবস, ভ্যালেন্টাইনস ইত্যাদি) মাথায় রেখে আগে থেকে পোস্ট প্ল্যান করুন।",
+"নিজের পেজের ফলোয়ারদের সাথে সরাসরি সম্পর্ক গড়ুন, শুধু বিক্রেতা না হয়ে একজন পরিচিত মানুষ হয়ে উঠুন।",
+"একবার বিক্রি বন্ধ থাকলে হতাশ না হয়ে বিশ্লেষণ করুন কোথায় সমস্যা — দাম, ছবি, নাকি সময়?"
+];
+
+function loadTipsPage(){
+  const dayOfYear=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/86400000);
+  const idx=dayOfYear%BUSINESS_TIPS.length;
+  const el=document.getElementById("daily-tip-text");
+  if(el)el.textContent=BUSINESS_TIPS[idx];
+  const dl=document.getElementById("tip-date-label");
+  if(dl)dl.textContent=new Date().toLocaleDateString("bn-BD",{day:"numeric",month:"long"});
+
+  // A couple more tips underneath for extra value
+  const moreEl=document.getElementById("tip-list-more");
+  if(moreEl){
+    let html="";
+    for(let i=1;i<=3;i++){
+      const t=BUSINESS_TIPS[(idx+i)%BUSINESS_TIPS.length];
+      html+="<div style=\"background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:8px;font-size:13px;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.05)\">💡 "+t+"</div>";
+    }
+    moreEl.innerHTML=html;
+  }
+
+  // Real working banner ads above and below the content (rotating units, not tied to any reward)
+  injectTipsAd("tips-ad-top");
+  injectTipsAd("tips-ad-bottom");
+}
+
+function injectTipsAd(containerId){
+  const holder=document.getElementById(containerId);
+  if(!holder)return;
+  holder.innerHTML="";
+  try{
+    const unit=FEED_AD_UNITS[Math.floor(Math.random()*FEED_AD_UNITS.length)];
+    const ifr=document.createElement("iframe");
+    ifr.style.cssText="width:100%;max-width:340px;height:"+unit.minHeight+"px;border:0";
+    ifr.scrolling="no";
+    holder.appendChild(ifr);
+    const idoc=ifr.contentWindow.document;
+    idoc.open();
+    idoc.write("<!DOCTYPE html><html><head><style>body{margin:0;padding:0;overflow:hidden;display:flex;align-items:center;justify-content:center}</style></head><body>"+unit.html+"</body></html>");
+    idoc.close();
+  }catch(e){}
+}
+
+// ===== রেইনি বেয়ার জ্যাকপট (full-screen ad + timer + wheel) =====
+const adsterraDirectLink="https://www.effectivecpmnetwork.com/dnfyvar3?key=b639eba4ea239564ecacec21ab299b7b";
+const RB_PRIZES=["5","7","10","12","15","17","20"];
+const RB_COLORS=["#0c4a6e","#0284c7","#38bdf8","#bae6fd","#0284c7","#075985","#0369a1"];
+let _adEarnConfig={dailyLimit:5,adDuration:60};
+let _rbTimeLeft=0,_rbAdInterval=null,_rbAdRefreshInterval=null,_rbIsSpinning=false,_rbAppActive=true;
+
+function jkTodayKey(){const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+
+function loadAdEarnConfig(cb){
+  db.collection("settings").doc("ad_earn").get().then(doc=>{
+    if(doc.exists){
+      const d=doc.data();
+      _adEarnConfig.dailyLimit=d.dailyLimit||5;
+      _adEarnConfig.adDuration=d.adDuration||60;
+    }
+    if(cb)cb();
+  }).catch(()=>{if(cb)cb();});
+}
+
+function loadJackpotPage(){
+  if(!CU)return;
+  loadAdEarnConfig(()=>{
+    const docId=CU.uid+"_"+jkTodayKey();
+    db.collection("ad_views").doc(docId).get().then(doc=>{
+      const count=doc.exists?(doc.data().count||0):0;
+      document.getElementById("ae-today-count").textContent=count+"/"+_adEarnConfig.dailyLimit;
+      const btn=document.getElementById("ae-watch-btn");
+      if(count>=_adEarnConfig.dailyLimit){btn.disabled=true;btn.textContent="✅ আজকের লিমিট শেষ";}
+      else{btn.disabled=false;btn.textContent="🎬 মিশন শুরু করুন";}
+    }).catch(()=>{});
+  });
+}
+
+// Pause the ad timer if the person leaves the app/tab, so they can't skip the wait by backgrounding it
+document.addEventListener("visibilitychange",function(){_rbAppActive=!document.hidden;});
+
+function rbShowAd(){
+  const visArea=document.getElementById("rb-ad-visible-area");
+  visArea.innerHTML="";
+  try{
+    const unit=FEED_AD_UNITS[Math.floor(Math.random()*FEED_AD_UNITS.length)];
+    const ifr=document.createElement("iframe");
+    ifr.style.cssText="width:100%;max-width:340px;height:"+unit.minHeight+"px;border:0";
+    ifr.scrolling="no";
+    visArea.appendChild(ifr);
+    const idoc=ifr.contentWindow.document;
+    idoc.open();
+    idoc.write("<!DOCTYPE html><html><head><style>body{margin:0;padding:0;overflow:hidden;display:flex;align-items:center;justify-content:center}</style></head><body>"+unit.html+"</body></html>");
+    idoc.close();
+  }catch(e){}
+}
+
+function startAdTask(){
+  if(!CU)return;
+  const docId=CU.uid+"_"+jkTodayKey();
+  db.collection("ad_views").doc(docId).get().then(doc=>{
+    const count=doc.exists?(doc.data().count||0):0;
+    if(count>=_adEarnConfig.dailyLimit){toast("আজকের লিমিট শেষ হয়ে গেছে!","er");return;}
+    _rbTimeLeft=_adEarnConfig.adDuration;
+    document.getElementById("fullscreenAd").style.display="flex";
+    document.getElementById("crossBtn").style.display="none";
+    document.getElementById("adTimer").parentNode.style.display="flex";
+    document.getElementById("adTimer").innerText="অপেক্ষা করুন: "+_rbTimeLeft+" সেকেন্ড";
+
+    // Show a real, reliably-loading banner ad full-screen, and refresh it every ~20s
+    // so a 60s wait registers several ad impressions instead of just one.
+    rbShowAd();
+    clearInterval(_rbAdRefreshInterval);
+    _rbAdRefreshInterval=setInterval(()=>{if(_rbAppActive)rbShowAd();},20000);
+
+    // Also fire the sponsor's direct-link ad in a tiny hidden iframe purely as a bonus
+    // impression attempt — if it fails to load, nothing else here depends on it.
+    try{document.getElementById("rb-hidden-tracker").src=adsterraDirectLink;}catch(e){}
+
+    clearInterval(_rbAdInterval);
+    _rbAppActive=true;
+    _rbAdInterval=setInterval(function(){
+      if(!_rbAppActive)return;
+      _rbTimeLeft--;
+      document.getElementById("adTimer").innerText="অপেক্ষা করুন: "+_rbTimeLeft+" সেকেন্ড";
+      if(_rbTimeLeft<=0){
+        clearInterval(_rbAdInterval);
+        clearInterval(_rbAdRefreshInterval);
+        document.getElementById("adTimer").parentNode.style.display="none";
+        document.getElementById("crossBtn").style.display="block";
+      }
+    },1000);
+  }).catch(()=>{toast("লোড হয়নি, আবার চেষ্টা করুন।","er");});
+}
+
+function handleAdClose(){
+  clearInterval(_rbAdRefreshInterval);
+  document.getElementById("fullscreenAd").style.display="none";
+  document.getElementById("rb-hidden-tracker").src="about:blank";
+  document.getElementById("rb-ad-visible-area").innerHTML="";
+  document.getElementById("lotteryModal").style.display="flex";
+  document.getElementById("lotteryTitle").innerHTML="🐻 ভাল্লুকের চাকাটি ঘুরান!";
+  document.getElementById("spinBtn").style.display="flex";
+  document.getElementById("finishBtn").style.display="none";
+  _rbIsSpinning=false;
+  drawRbWheel();
+}
+
+function drawRbWheel(){
+  const canvas=document.getElementById("rbWheel");
+  const ctx=canvas.getContext("2d");
+  const n=RB_PRIZES.length,seg=(2*Math.PI)/n;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const r=canvas.width/2;
+  for(let i=0;i<n;i++){
+    ctx.beginPath();ctx.moveTo(r,r);
+    ctx.arc(r,r,r-10,(i*seg)-Math.PI/2,((i+1)*seg)-Math.PI/2);
+    ctx.fillStyle=RB_COLORS[i];ctx.fill();ctx.strokeStyle="#fff";ctx.lineWidth=3;ctx.stroke();
+    ctx.save();ctx.translate(r,r);ctx.rotate((i*seg+seg/2)-Math.PI/2);
+    ctx.fillStyle="#fff";ctx.font="bold 16px sans-serif";ctx.textAlign="right";
+    ctx.fillText(RB_PRIZES[i],r-25,6);ctx.restore();
+  }
+}
+
+function spinTheWheel(){
+  if(_rbIsSpinning||!CU)return;
+  _rbIsSpinning=true;
+  document.getElementById("spinBtn").style.display="none";
+
+  let prizeIndex;
+  const rand=Math.random()*100;
+  if(rand<19.6)prizeIndex=0;
+  else if(rand<39.2)prizeIndex=1;
+  else if(rand<58.8)prizeIndex=2;
+  else if(rand<78.4)prizeIndex=3;
+  else if(rand<98.0)prizeIndex=4;
+  else if(rand<99.5)prizeIndex=5;
+  else prizeIndex=6;
+
+  const selectedPrize=RB_PRIZES[prizeIndex];
+  const n=RB_PRIZES.length,segAngle=360/n;
+  const targetRotation=1800+(360-(prizeIndex*segAngle)-(segAngle/2));
+  document.getElementById("rbWheel").style.transition="transform 4.5s cubic-bezier(0.1,0.8,0.15,1)";
+  document.getElementById("rbWheel").style.transform="rotate("+targetRotation+"deg)";
+
+  setTimeout(function(){
+    const docId=CU.uid+"_"+jkTodayKey();
+    db.runTransaction(t=>{
+      return t.get(db.collection("ad_views").doc(docId)).then(doc=>{
+        const count=doc.exists?(doc.data().count||0):0;
+        t.set(db.collection("ad_views").doc(docId),{uid:CU.uid,date:jkTodayKey(),count:count+1},{merge:true});
+      });
+    }).then(()=>{
+      addDrops(CU.uid,parseInt(selectedPrize),"🎰 রেইনি বেয়ার জ্যাকপট স্পিন");
+      document.getElementById("lotteryTitle").innerHTML="<span style='color:#38bdf8;text-shadow:0 0 12px #0ea5e9'>🐻 মেগা সাকসেস!</span><br>আপনি জিতেছেন "+selectedPrize+" 💧 ড্রপস!";
+      document.getElementById("finishBtn").style.display="inline-block";
+      createRainDropsEffect();
+    }).catch(()=>{toast("সমস্যা হয়েছে, আবার চেষ্টা করুন।","er");});
+  },4500);
+}
+
+function createRainDropsEffect(){
+  const total=45;
+  for(let i=0;i<total;i++){
+    setTimeout(()=>{
+      const drop=document.createElement("div");
+      drop.className="rb-drop-particle";
+      drop.style.left=Math.random()*100+"vw";
+      const scale=0.5+Math.random()*0.8;
+      drop.style.transform="rotate(45deg) scale("+scale+")";
+      drop.style.animationDuration=(1.4+Math.random()*1.4)+"s";
+      document.body.appendChild(drop);
+      setTimeout(()=>{drop.remove();},2500);
+    },i*50);
+  }
+}
+
+function finishAdTask(){
+  document.getElementById("lotteryModal").style.display="none";
+  document.getElementById("rbWheel").style.transition="none";
+  document.getElementById("rbWheel").style.transform="rotate(0deg)";
+  loadJackpotPage();
+}
+
+function saveAdEarnConfig(){
+  const limit=parseInt(document.getElementById("aer-limit").value)||5;
+  const duration=parseInt(document.getElementById("aer-duration").value)||60;
+  showL("সেভ হচ্ছে...");
+  db.collection("settings").doc("ad_earn").set({dailyLimit:limit,adDuration:duration},{merge:true})
+    .then(()=>{hideL();toast("✅ সেভ হয়েছে!","ok");_adEarnConfig={dailyLimit:limit,adDuration:duration};})
+    .catch(()=>{hideL();toast("সমস্যা হয়েছে!","er");});
+}
+
 function loadAdminProds(){
   const el=document.getElementById("a-prods");if(!el)return;
   db.collection("products").get().then(snap=>{
@@ -3833,6 +4214,24 @@ function previewProdImg(input,boxId,slot){
     if(oldInput)box.appendChild(oldInput);
   };
   r.readAsDataURL(input.files[0]);
+}
+  function copyProductDetails(){
+  const name=document.getElementById("detail-name").textContent.trim();
+  const price=document.getElementById("detail-price").textContent.trim();
+  const desc=document.getElementById("detail-desc").textContent.trim();
+  const text=name+"\n"+price+"\n\n"+desc;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast("✅ কপি হয়েছে!","ok")).catch(()=>fallbackCopy(text));
+  }else{
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta=document.createElement("textarea");
+  ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand("copy");toast("✅ কপি হয়েছে!","ok");}catch(e){toast("কপি হয়নি!","er");}
+  document.body.removeChild(ta);
 }
 
 async function downloadCurProdImg(){
