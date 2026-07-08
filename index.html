@@ -500,7 +500,6 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="page" id="shop">
 <div class="topbar"><button class="back-btn" onclick="gp('home')">← পিছে</button><div style="font-weight:700;font-size:15px">🛍️ Shop</div><button class="ibtn" onclick="gp('my-orders')">📦</button></div>
 <div style="overflow-y:auto;padding-bottom:80px">
-  <div id="shop-banner-row" style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;gap:10px;padding:10px 14px 4px;-webkit-overflow-scrolling:touch"></div>
 
 <div class="cat-row" id="shop-cat-row"><button class="cat-btn active" onclick="filterCat(this,'all')">সব</button><button class="cat-btn" onclick="filterCat(this,'helmet')">হেলমেট</button><button class="cat-btn" onclick="filterCat(this,'gypsum')">গিপসাম</button><button class="cat-btn" onclick="filterCat(this,'candle')">মোমবাতি</button><button class="cat-btn" onclick="filterCat(this,'decor')">ডেকোর</button></div>
 <div class="prod-grid" id="prod-grid"></div>
@@ -520,7 +519,6 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div style="font-size:16px;font-weight:700;color:var(--blue);margin-top:5px" id="detail-price">৳ ০</div>
 <div style="font-size:13px;color:var(--gray);margin-top:3px" id="detail-stock">স্টক</div>
 <div style="margin-top:14px;font-size:14px;line-height:1.7;color:var(--text)" id="detail-desc">বিবরণ</div>
-  <button onclick="copyProductDetails()" style="margin-top:10px;background:var(--blue-light);color:var(--blue);border:none;border-radius:20px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer">📋 কপি করুন</button>
 
 <div class="card" style="margin-top:16px;padding:16px">
 <h2 style="font-size:16px;margin-bottom:10px">💰 আপনার বিক্রয় দাম নির্ধারণ করুন</h2>
@@ -1079,21 +1077,6 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="fg"><label class="fl">এ্যাড দেখার বাধ্যতামূলক সময় (সেকেন্ড)</label><div class="fi-wrap"><span class="fi-icon">⏱</span><input type="number" class="fi" id="aer-duration" placeholder="60"></div></div>
 <button class="btn btn-p" onclick="saveAdEarnConfig()">সেভ করুন</button>
 </div></div></div>
-<div class="page" id="admin-shop-banners">
-<div class="topbar"><button class="back-btn" onclick="gp('admin')">← পিছে</button><div style="font-weight:700;font-size:15px">🖼️ শপ ব্যানার</div><div></div></div>
-<div class="auth-body">
-<div class="card">
-<div class="fg"><label class="fl">ব্যানার ছবি</label></div>
-<div onclick="pickGallery('sb-img')" style="aspect-ratio:2.2;background:var(--bg);border:2px dashed var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;margin-bottom:14px" id="sb-img-box">
-<div style="font-size:24px">📸</div><div style="font-size:11px;color:var(--gray);margin-top:4px">ছবি বেছে নিন (লম্বা/চওড়া ব্যানার ছবি ভালো দেখাবে)</div>
-<input type="file" id="sb-img" accept="image/*" style="display:none" onchange="previewShopBanner(this)">
-</div>
-<div class="fg"><label class="fl">লিংক (ঐচ্ছিক — ট্যাপ করলে কোথায় যাবে)</label><div class="fi-wrap"><span class="fi-icon">🔗</span><input type="text" class="fi" id="sb-link" placeholder="https://..."></div></div>
-<div class="fg"><label class="fl">ক্রম (ছোট সংখ্যা আগে দেখাবে)</label><div class="fi-wrap"><span class="fi-icon">🔢</span><input type="number" class="fi" id="sb-order" placeholder="১"></div></div>
-<button class="btn btn-p" onclick="addShopBanner()">✅ ব্যানার যোগ করুন</button>
-</div>
-<div class="card"><h2>বর্তমান ব্যানার</h2><div id="sb-list"></div></div>
-</div></div>
 
 <div class="page" id="admin">
 <div class="topbar"><button class="back-btn" onclick="gp('profile')">← পিছে</button><div style="font-weight:700;font-size:15px">👑 Admin Panel</div><div></div></div>
@@ -1117,8 +1100,7 @@ body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);min-height
 <div class="a-menu" onclick="gp('admin-network')"><span>📡</span><div style="flex:1"><div style="font-weight:600">নেটওয়ার্ক অর্ডার</div><div style="font-size:12px;color:var(--gray)">মূল্য সেটিং ও অর্ডার</div></div><span style="color:var(--gray)">›</span></div>
 <div class="a-menu" onclick="gp('admin-tasks')"><span>🎯</span><div style="flex:1"><div style="font-weight:600">ছোট কাজ ম্যানেজমেন্ট</div><div style="font-size:12px;color:var(--gray)">কাজ যোগ ও সাবমিশন রিভিউ</div></div><span class="ndot" id="task-pending-dot" style="background:#EF4444;display:none"></span><span style="color:var(--gray)">›</span></div>
 <div class="a-menu" onclick="gp('admin-features')"><span>🔒</span><div style="flex:1"><div style="font-weight:600">ফিচার লক/আনলক</div><div style="font-size:12px;color:var(--gray)">অসম্পূর্ণ ফিচার লুকান/দেখান</div></div><span style="color:var(--gray)">›</span></div>
-<div class="a-menu" onclick="gp('admin-shop-banners')"><span>🖼️</span><div style="flex:1"><div style="font-weight:600">শপ ব্যানার</div><div style="font-size:12px;color:var(--gray)">স্ক্রলিং ডিসকাউন্ট ব্যানার</div></div><span style="color:var(--gray)">›</span></div>
-  <div class="a-menu" onclick="gp('admin-jackpot')"><span>🐻</span><div style="flex:1"><div style="font-weight:600">রেইনি বেয়ার জ্যাকপট সেটিংস</div><div style="font-size:12px;color:var(--gray)">দৈনিক লিমিট ও সময়</div></div><span style="color:var(--gray)">›</span></div>
+<div class="a-menu" onclick="gp('admin-jackpot')"><span>🐻</span><div style="flex:1"><div style="font-weight:600">রেইনি বেয়ার জ্যাকপট সেটিংস</div><div style="font-size:12px;color:var(--gray)">দৈনিক লিমিট ও সময়</div></div><span style="color:var(--gray)">›</span></div>
 </div></div></div>
 
 <!-- ADMIN SUB PAGES -->
@@ -1338,8 +1320,7 @@ function gp(id,skipHistory){
     renderFeed();
     injectAdBanner("home-ad-slot","small","shop");
   }
-if(id==="shop"){loadShop("all");syncShopCategories();loadShopBanners();}
-  if(id==="admin-shop-banners")loadAdminShopBanners();
+  if(id==="shop"){loadShop("all");syncShopCategories();}
   if(id==="feature-hub")loadFeatureLocks();
   if(id==="admin-features")loadFeatureLocks();
   if(id==="hub-adearn")loadTipsPage();
@@ -1520,7 +1501,7 @@ async function uploadToCloudinary(file, folder="verification"){
 const SCAN_CONFIG = {
   models: "nudity-2.0,weapon,recreational_drug,offensive,gore-2.0",
   thresholds: {
-    nudity: 0.5,
+    nudity: 0.4,
     weapon: 0.7,
     drug: 0.7,
     offensive: 0.7,
@@ -1541,8 +1522,20 @@ async function scanImage(file){
     const d = await r.json();
     if(d.status!=="success") return {safe:true};
     const t = SCAN_CONFIG.thresholds;
+    const sc = d.nudity?.suggestive_classes||{};
     const scores = {
-      nudity:   Math.max(d.nudity?.sexual_activity||0, d.nudity?.sexual_display||0),
+      nudity:   Math.max(
+                  d.nudity?.sexual_activity||0,
+                  d.nudity?.sexual_display||0,
+                  d.nudity?.erotica||0,
+                  d.nudity?.suggestive||0,
+                  sc.bikini||0,
+                  sc.cleavage||0,
+                  sc.lingerie||0,
+                  sc.male_chest||0,
+                  sc.male_underwear||0,
+                  sc.miniskirt||0
+                ),
       weapon:   d.weapon?.classes?.firearm||d.weapon?.classes?.knife||0,
       drug:     d.recreational_drug?.prob||0,
       offensive:d.offensive?.prob||0,
@@ -2628,91 +2621,6 @@ function submitWithdraw(){
     .then(()=>{hideL();toast("✅ উইথড্র রিকোয়েস্ট পাঠানো হয়েছে!","ok");sendNotif(CU.uid,"💸 উইথড্র রিকোয়েস্ট",amount+"টাকা উইথড্র রিকোয়েস্ট করা হয়েছে");gp("wallet");})
     .catch(()=>{hideL();toast("সমস্যা!","er");});
 }
-  function loadShopBanners(){
-  const row=document.getElementById("shop-banner-row");
-  if(!row)return;
-  db.collection("shop_banners").orderBy("order","asc").get().then(snap=>{
-    row.innerHTML="";
-    if(snap.empty)return;
-    snap.forEach(d=>{
-      const b=d.data();
-      const img=document.createElement("img");
-      img.src=b.imgUrl;
-      img.style.cssText="min-width:92%;height:130px;object-fit:cover;border-radius:12px;scroll-snap-align:start;flex-shrink:0;cursor:pointer";
-      if(b.link)img.onclick=()=>window.open(b.link,"_blank");
-      row.appendChild(img);
-    });
-    startShopBannerAutoScroll(row);
-  }).catch(()=>{});
-}
-
-let _sbAutoTimer=null;
-function startShopBannerAutoScroll(row){
-  clearInterval(_sbAutoTimer);
-  _sbAutoTimer=setInterval(()=>{
-    if(!row||!row.children.length)return;
-    const slideW=row.children[0].offsetWidth+10;
-    const maxScroll=row.scrollWidth-row.clientWidth;
-    if(row.scrollLeft>=maxScroll-5)row.scrollTo({left:0,behavior:"smooth"});
-    else row.scrollTo({left:row.scrollLeft+slideW,behavior:"smooth"});
-  },3500);
-}
-
-let _sbImgFile=null;
-function previewShopBanner(input){
-  if(input.files&&input.files[0]){
-    _sbImgFile=input.files[0];
-    const r=new FileReader();
-    r.onload=e=>document.getElementById("sb-img-box").innerHTML="<img src=\""+e.target.result+"\" style=\"width:100%;height:100%;object-fit:cover\">";
-    r.readAsDataURL(_sbImgFile);
-  }
-}
-
-async function addShopBanner(){
-  if(!_sbImgFile){toast("ব্যানার ছবি দিন!","er");return;}
-  const link=document.getElementById("sb-link").value.trim();
-  const order=parseInt(document.getElementById("sb-order").value)||1;
-  showL("যোগ হচ্ছে...");
-  try{
-    const r=await uploadToImgBB(_sbImgFile,"banner");
-    await db.collection("shop_banners").add({
-      imgUrl:r.url,link,order,createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
-    hideL();toast("✅ ব্যানার যোগ হয়েছে!","ok");
-    document.getElementById("sb-link").value="";
-    document.getElementById("sb-order").value="";
-    document.getElementById("sb-img-box").innerHTML="<div style=\"font-size:24px\">📸</div><div style=\"font-size:11px;color:var(--gray);margin-top:4px\">ছবি বেছে নিন</div>";
-    _sbImgFile=null;
-    loadAdminShopBanners();
-  }catch(e){hideL();toast("সমস্যা হয়েছে!","er");}
-}
-
-function loadAdminShopBanners(){
-  const el=document.getElementById("sb-list");if(!el)return;
-  el.innerHTML="<div style='text-align:center;padding:20px;color:var(--gray)'>লোড হচ্ছে...</div>";
-  db.collection("shop_banners").orderBy("order","asc").get().then(snap=>{
-    if(snap.empty){el.innerHTML="<div style='text-align:center;padding:20px;color:var(--gray)'>কোনো ব্যানার নেই</div>";return;}
-    el.innerHTML="";
-    snap.forEach(d=>{
-      const b=d.data();
-      el.innerHTML+="<div style='display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)'>"
-        +"<img src=\""+b.imgUrl+"\" style='width:70px;height:40px;object-fit:cover;border-radius:6px'>"
-        +"<div style='flex:1;font-size:12px;color:var(--gray)'>ক্রম: "+(b.order||1)+(b.link?"<br>🔗 লিংক আছে":"")+"</div>"
-        +"<button onclick=\"deleteShopBanner('"+d.id+"')\" style='background:var(--error);color:#fff;border:none;border-radius:7px;padding:6px 10px;cursor:pointer;font-size:12px'>🗑️</button>"
-        +"</div>";
-    });
-  }).catch(()=>{el.innerHTML="<div style='text-align:center;padding:20px;color:var(--error)'>লোড হয়নি</div>";});
-}
-
-function deleteShopBanner(id){
-  showConfirm("এই ব্যানারটি মুছবেন?",()=>{
-    showL("মুছা হচ্ছে...");
-    db.collection("shop_banners").doc(id).delete()
-      .then(()=>{hideL();toast("মুছে ফেলা হয়েছে","ok");loadAdminShopBanners();})
-      .catch(()=>{hideL();toast("সমস্যা হয়েছে!","er");});
-  });
-}
-
 
 function loadShop(cat){
   const g=document.getElementById("prod-grid");if(!g)return;
@@ -4291,24 +4199,6 @@ function previewProdImg(input,boxId,slot){
     if(oldInput)box.appendChild(oldInput);
   };
   r.readAsDataURL(input.files[0]);
-}
-  function copyProductDetails(){
-  const name=document.getElementById("detail-name").textContent.trim();
-  const price=document.getElementById("detail-price").textContent.trim();
-  const desc=document.getElementById("detail-desc").textContent.trim();
-  const text=name+"\n"+price+"\n\n"+desc;
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(()=>toast("✅ কপি হয়েছে!","ok")).catch(()=>fallbackCopy(text));
-  }else{
-    fallbackCopy(text);
-  }
-}
-function fallbackCopy(text){
-  const ta=document.createElement("textarea");
-  ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
-  document.body.appendChild(ta);ta.select();
-  try{document.execCommand("copy");toast("✅ কপি হয়েছে!","ok");}catch(e){toast("কপি হয়নি!","er");}
-  document.body.removeChild(ta);
 }
 
 async function downloadCurProdImg(){
