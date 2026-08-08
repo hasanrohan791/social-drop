@@ -1417,16 +1417,14 @@ function showPrompt(msg,onSubmit){
 
 // ===== IMAGE UPLOAD SYSTEM =====
 // ImgBB API
-const IMGBB_KEY = "3be582772f077bece210c86fd42bdc19";
 const IMGBB_ALBUMS = {
   profile:  "0Q1Ndy",
   product:  "5BWWF7",
   post:     "WGgXJG"
 };
-// Sightengine API
-const SE_USER   = "573922418";
-const SE_SECRET = "rJxovq2h6UbHNenhETHkakJSL2fM7XGn";
-// Cloudinary (verification only)
+// Sightengine স্ক্যান এখন /api/scan-image (Vercel প্রক্সি) দিয়ে হয় — 
+// আসল key এখানে নেই, এটা Vercel-এর Environment Variable-এ গোপনে থাকে
+// Cloudinary
 const CLOUD = "dcwhojxfy", PRESET = "social_drop";
 
 // Resize image before upload (canvas)
@@ -1450,49 +1448,21 @@ function resizeImage(file, maxWidth=1200, quality=0.85){
 }
 
 // Upload to ImgBB
-async function uploadToImgBB(file, albumType="post"){
+// Upload to Cloudinary (single unified image host for the whole app)
+async function uploadToCloudinary(file, folder="post"){
   const blob = await resizeImage(file);
-  // Convert blob to base64 (ImgBB works best with base64)
-  const base64 = await new Promise((res,rej)=>{
-    const reader=new FileReader();
-    reader.onload=()=>res(reader.result.split(",")[1]);
-    reader.onerror=rej;
-    reader.readAsDataURL(blob);
-  });
   const fd = new FormData();
-  fd.append("image", base64);
-  fd.append("key", IMGBB_KEY);
-  fd.append("name", albumType+"_"+Date.now());
-  // album parameter only works on paid plan  skip for free
-  const r = await fetch("https://api.imgbb.com/1/upload", {method:"POST", body:fd});
-  if(!r.ok) throw new Error("ImgBB HTTP error: "+r.status);
-  const d = await r.json();
-  if(!d.success) throw new Error(d.error?.message||"ImgBB upload failed");
-  return {
-    url: d.data.url,
-    deleteUrl: d.data.delete_url||"",
-    thumbUrl: d.data.thumb?.url||d.data.display_url||d.data.url
-  };
-}
-
-// Delete from ImgBB using delete_url
-async function deleteFromImgBB(deleteUrl){
-  if(!deleteUrl) return;
-  try{
-    await fetch(deleteUrl, {method:"GET", mode:"no-cors"});
-  }catch(e){}
-}
-
-// Upload to Cloudinary (verification only)
-async function uploadToCloudinary(file, folder="verification"){
-  const fd = new FormData();
-  fd.append("file", file);
+  fd.append("file", blob);
   fd.append("upload_preset", PRESET);
   fd.append("folder", "social_drop/"+folder);
   const r = await fetch("https://api.cloudinary.com/v1_1/"+CLOUD+"/image/upload",{method:"POST",body:fd});
   const d = await r.json();
   if(d.error) throw new Error(d.error.message);
-  return d.secure_url;
+  return {
+    url: d.secure_url,
+    deleteUrl: "",
+    thumbUrl: d.secure_url
+  };
 }
 
 // Scan image with Sightengine
@@ -1501,7 +1471,7 @@ async function uploadToCloudinary(file, folder="verification"){
 const SCAN_CONFIG = {
   models: "nudity-2.0,weapon,recreational_drug,offensive,gore-2.0",
   thresholds: {
-    nudity: 0.5,
+    nudity: 0.4,
     weapon: 0.7,
     drug: 0.7,
     offensive: 0.7,
@@ -1512,18 +1482,35 @@ const SCAN_CONFIG = {
 async function scanImage(file){
   try{
     const blob = await resizeImage(file, 800, 0.8);
-    const fd = new FormData();
-    fd.append("media", blob, "scan.jpg");
-    fd.append("models", SCAN_CONFIG.models);
-    fd.append("api_user", SE_USER);
-    fd.append("api_secret", SE_SECRET);
-    const r = await fetch("https://api.sightengine.com/1.0/check.json",{method:"POST",body:fd});
-    if(!r.ok) return {safe:true};
+    const imageBase64 = await new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onload=()=>resolve(reader.result.split(",")[1]);
+      reader.onerror=reject;
+      reader.readAsDataURL(blob);
+    });
+    const r = await fetch("/api/scan-image",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({imageBase64})
+    });
+    if(!r.ok) return {safe:false, reason:"স্ক্যান সার্ভিসে সমস্যা"}; // fail-safe: block, don't auto-approve
     const d = await r.json();
-    if(d.status!=="success") return {safe:true};
+    if(d.status!=="success") return {safe:false, reason:"স্ক্যান সম্পন্ন হয়নি"}; // fail-safe
     const t = SCAN_CONFIG.thresholds;
+    const sc = d.nudity?.suggestive_classes||{};
     const scores = {
-      nudity:   Math.max(d.nudity?.sexual_activity||0, d.nudity?.sexual_display||0),
+      nudity:   Math.max(
+                  d.nudity?.sexual_activity||0,
+                  d.nudity?.sexual_display||0,
+                  d.nudity?.erotica||0,
+                  d.nudity?.suggestive||0,
+                  sc.bikini||0,
+                  sc.cleavage||0,
+                  sc.lingerie||0,
+                  sc.male_chest||0,
+                  sc.male_underwear||0,
+                  sc.miniskirt||0
+                ),
       weapon:   d.weapon?.classes?.firearm||d.weapon?.classes?.knife||0,
       drug:     d.recreational_drug?.prob||0,
       offensive:d.offensive?.prob||0,
@@ -1543,8 +1530,8 @@ async function scanImage(file){
     ):"";
     return {safe:!isUnsafe, scores, reason};
   }catch(e){
-    console.warn("Sightengine error:", e);
-    return {safe:true}; // network error - fail open (allow)
+    console.warn("Scan error:", e);
+    return {safe:false, reason:"স্ক্যান করা যায়নি, আবার চেষ্টা করুন"}; // fail-safe: block on any error
   }
 }
 
@@ -1578,7 +1565,7 @@ async function uploadPostImg(file){
   }
   // Safe  upload to ImgBB posts album
   showL("ছবি আপলোড হচ্ছে...");
-  return await uploadToImgBB(file, "post");
+  return await uploadToCloudinary(file, "post");
 }
 
 // Profile pic upload  ImgBB profile album
@@ -1586,10 +1573,9 @@ async function uploadProfileImg(input){
   if(!input.files[0]||!CU)return;
   showL("প্রোফাইল ছবি আপলোড হচ্ছে...");
   try{
-    const {url, deleteUrl} = await uploadToImgBB(input.files[0], "profile");
+    const {url, deleteUrl} = await uploadToCloudinary(input.files[0], "profile");
     // Delete old profile pic from ImgBB
     const oldDeleteUrl = CUD&&CUD.profileImgDeleteUrl;
-    if(oldDeleteUrl) deleteFromImgBB(oldDeleteUrl);
     // Update user doc
     await db.collection("users").doc(CU.uid).update({profileImg:url, profileImgDeleteUrl:deleteUrl});
     // Batch update all posts by this user
@@ -1612,8 +1598,7 @@ async function uploadProfileImg(input){
 
 // Generic uploadImg (kept for backward compat  routes by context)
 async function uploadImg(file, type="post"){
-  if(type==="verification") return await uploadToCloudinary(file);
-  const result = await uploadToImgBB(file, type);
+  const result = await uploadToCloudinary(file, type==="verification"?"verification":type);
   return result.url;
 }
 
@@ -2068,7 +2053,6 @@ function openPostMenu(postId,authorUid){
         const pdata=pd.exists?pd.data():{};
         return db.collection("posts").doc(postId).delete().then(()=>{
           // Delete from ImgBB
-          if(pdata.imgDeleteUrl) deleteFromImgBB(pdata.imgDeleteUrl);
           toast("পোস্ট মুছে ফেলা হয়েছে","ok");
           db.collection("users").doc(authorUid).get().then(ud=>{
             const cur=ud.exists?(ud.data().posts||0):0;
@@ -2569,9 +2553,9 @@ async function submitVerify(){
   if(!selfie){toast("সেলফি দিন!","er");return;}
   showL("আপলোড হচ্ছে...");
   try{
-    const frontUrl=await uploadToCloudinary(front,"verification");
-    const backUrl=needBack?(await uploadToCloudinary(back,"verification")):"";
-    const selfieUrl=await uploadToCloudinary(selfie,"verification");
+    const frontUrl=(await uploadToCloudinary(front,"verification")).url;
+    const backUrl=needBack?((await uploadToCloudinary(back,"verification")).url):"";
+    const selfieUrl=(await uploadToCloudinary(selfie,"verification")).url;
     await db.collection("verifications").add({uid:CU.uid,name:CUD&&CUD.name,docType:selDocType,frontUrl,backUrl,selfieUrl,status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});
     hideL();toast("✅ ভেরিফিকেশন রিকোয়েস্ট পাঠানো হয়েছে!","ok");setTimeout(()=>gp("profile"),1500);
   }catch(e){hideL();toast("সমস্যা হয়েছে!","er");}
@@ -3176,7 +3160,7 @@ async function submitTaskProof(){
   if(!tdProofFile){toast("প্রমাণের স্ক্রিনশট দিন!","er");return;}
   showL("জমা হচ্ছে...");
   try{
-    const proofUrl=await uploadToCloudinary(tdProofFile,"tasks");
+    const proofUrl=(await uploadToCloudinary(tdProofFile,"tasks")).url;
     const note=document.getElementById("td-note").value.trim();
     await db.collection("task_submissions").add({
       taskId:curTaskId,taskTitle:curTaskData.title,uid:CU.uid,name:CUD&&CUD.name,
@@ -3712,9 +3696,9 @@ async function saveEditProduct(){
   if(maxPrice<=costPrice){toast("সর্বোচ্চ দাম পাইকারি দামের বেশি হতে হবে!","er");return;}
   showL("আপডেট হচ্ছে...");
   try{
-    const re1=img1?await uploadToImgBB(img1,"product"):null;
-    const re2=img2?await uploadToImgBB(img2,"product"):null;
-    const re3=img3?await uploadToImgBB(img3,"product"):null;
+    const re1=img1?await uploadToCloudinary(img1,"product"):null;
+    const re2=img2?await uploadToCloudinary(img2,"product"):null;
+    const re3=img3?await uploadToCloudinary(img3,"product"):null;
     const imgUrl=re1?re1.url:(_editProdImgs[0]||_editProdImgUrl||"");
     const imgUrl2=re2?re2.url:(_editProdImgs[1]||"");
     const imgUrl3=re3?re3.url:(_editProdImgs[2]||"");
@@ -3747,9 +3731,9 @@ async function addProduct(){
   if(maxPrice<=costPrice){toast("সর্বোচ্চ দাম পাইকারি দামের চেয়ে বেশি হতে হবে!","er");return;}
   showL("পণ্য যোগ হচ্ছে...");
   try{
-    const r1=img1?await uploadToImgBB(img1,"product"):{};
-    const r2=img2?await uploadToImgBB(img2,"product"):{};
-    const r3=img3?await uploadToImgBB(img3,"product"):{};
+    const r1=img1?await uploadToCloudinary(img1,"product"):{};
+    const r2=img2?await uploadToCloudinary(img2,"product"):{};
+    const r3=img3?await uploadToCloudinary(img3,"product"):{};
     const imgUrl=r1.url||"", imgUrl2=r2.url||"", imgUrl3=r3.url||"";
     const imgDel1=r1.deleteUrl||"", imgDel2=r2.deleteUrl||"", imgDel3=r3.deleteUrl||"";
     const com1=parseFloat(document.getElementById("p-ref1")?.value)||0;
@@ -4672,7 +4656,7 @@ async function approveBlockedImg(docId, uid, tempUrl){
     const resp=await fetch(tempUrl);
     const blob=await resp.blob();
     const file=new File([blob],"approved.jpg",{type:"image/jpeg"});
-    const {url,deleteUrl}=await uploadToImgBB(file,"post");
+    const {url,deleteUrl}=await uploadToCloudinary(file,"post");
     // Save as approved post image
     await db.collection("blocked_images").doc(docId).update({
       status:"approved", approvedUrl:url, approvedAt:firebase.firestore.FieldValue.serverTimestamp()
