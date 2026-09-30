@@ -44,7 +44,7 @@ function getPublicIdFromCloudinaryUrl(url) {
 
     let path = parsed.pathname.substring(index + marker.length);
 
-    // Version অংশ বাদ
+    // Version বাদ
     path = path.replace(/^v\d+\//, "");
 
     // Transformation থাকলে বাদ
@@ -72,7 +72,6 @@ function getPublicIdFromCloudinaryUrl(url) {
     path = path.replace(/\.[^/.]+$/, "");
 
     return path || null;
-
   } catch {
     return null;
   }
@@ -80,14 +79,21 @@ function getPublicIdFromCloudinaryUrl(url) {
 
 function createSignature(params) {
   const stringToSign = Object.entries(params)
-    .filter(([, value]) => value !== undefined && value !== null && value !== "")
+    .filter(
+      ([, value]) =>
+        value !== undefined &&
+        value !== null &&
+        value !== ""
+    )
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, value]) => ${key}=${value})
+    .map(([key, value]) => `${key}=${value}`)
     .join("&");
 
   return crypto
     .createHash("sha1")
-    .update(stringToSign + process.env.CLOUDINARY_API_SECRET)
+    .update(
+      stringToSign + process.env.CLOUDINARY_API_SECRET
+    )
     .digest("hex");
 }
 
@@ -142,20 +148,22 @@ export default async function handler(req, res) {
     const userData = userSnap.data() || {};
     const currentProfileImg = userData.profileImg || "";
 
-    // Security check:
-    // App যে image পাঠাচ্ছে সেটাই user's current image কিনা
+    // Security check
     if (currentProfileImg !== profileImg) {
       return res.status(403).json({
-        error: "This profile image does not belong to the authenticated user"
+        error:
+          "This profile image does not belong to the authenticated user"
       });
     }
 
     // Cloudinary public ID বের করা
-    const publicId = getPublicIdFromCloudinaryUrl(currentProfileImg);
+    const publicId =
+      getPublicIdFromCloudinaryUrl(currentProfileImg);
 
     if (!publicId) {
       return res.status(400).json({
-        error: "Cloudinary public ID could not be determined"
+        error:
+          "Cloudinary public ID could not be determined"
       });
     }
 
@@ -171,32 +179,48 @@ export default async function handler(req, res) {
     const signature = createSignature(params);
 
     const cloudinaryUrl =
-      https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/explicit;
+      `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/explicit`;
 
     const form = new URLSearchParams();
+
     form.append("public_id", publicId);
     form.append("type", "upload");
-    form.append("asset_folder", "socialdrop_profile/archive");
+    form.append(
+      "asset_folder",
+      "socialdrop_profile/archive"
+    );
     form.append("timestamp", String(timestamp));
-    form.append("api_key", process.env.CLOUDINARY_API_KEY);
+    form.append(
+      "api_key",
+      process.env.CLOUDINARY_API_KEY
+    );
     form.append("signature", signature);
 
-    const cloudinaryResponse = await fetch(cloudinaryUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: form
-    });
+    const cloudinaryResponse = await fetch(
+      cloudinaryUrl,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+        body: form
+      }
+    );
 
     const result = await cloudinaryResponse.json();
 
     if (!cloudinaryResponse.ok) {
-      console.error("Cloudinary archive error:", result);
+      console.error(
+        "Cloudinary archive error:",
+        result
+      );
 
       return res.status(502).json({
         error: "Cloudinary archive failed",
-        detail: result?.error?.message || "Unknown Cloudinary error"
+        detail:
+          result?.error?.message ||
+          "Unknown Cloudinary error"
       });
     }
 
@@ -204,11 +228,14 @@ export default async function handler(req, res) {
       success: true,
       archived: true,
       publicId,
-      assetFolder: "socialdrop_profile/archive"
+      assetFolder:
+        "socialdrop_profile/archive"
     });
-
   } catch (error) {
-    console.error("archive-profile error:", error);
+    console.error(
+      "archive-profile error:",
+      error
+    );
 
     return res.status(500).json({
       error: "Profile image archive failed"
