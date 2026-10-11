@@ -21,7 +21,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ status: 'ERROR', error: 'imageBase64 required' });
     }
 
-    // Direct Binary Media Stream to Sightengine API
     const formData = new FormData();
     const blob = new Blob([Buffer.from(imageBase64, 'base64')], { type: 'image/jpeg' });
     formData.append('media', blob, 'scan_image.jpg');
