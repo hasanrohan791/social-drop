@@ -15,7 +15,6 @@ export default async function handler(req, res) {
       return res.status(500).json({ status: 'ERROR', error: 'Server configuration error' });
     }
 
-    // Node.js নেটিভ Buffer ও FormData হ্যান্ডলার
     const { imageBase64 } = req.body || {};
 
     if (!imageBase64) {
@@ -38,7 +37,7 @@ export default async function handler(req, res) {
 
     if (data.status === 'success') {
       const nudity = data.nudity || {};
-      const isNudity = (nudity.sexual_activity || 0) > 0.40 || (nudity.sexual_display || 0) > 0.40;
+      const isNudity = (nudity.sexual_activity || 0) > 0.40 || (nudity.sexual_display || 0) > 0.40 || (nudity.erotica || 0) > 0.50;
       const isWeapon = (data.weapon || 0) > 0.50;
       const isDrugs = (data.drugs || 0) > 0.50;
       const isOffensive = (data.offensive?.prob || 0) > 0.50;
