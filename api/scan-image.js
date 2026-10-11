@@ -21,6 +21,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ status: 'ERROR', error: 'imageBase64 required' });
     }
 
+    // Direct Binary Media Stream to Sightengine API
     const formData = new FormData();
     const blob = new Blob([Buffer.from(imageBase64, 'base64')], { type: 'image/jpeg' });
     formData.append('media', blob, 'scan_image.jpg');
@@ -48,7 +49,7 @@ export default async function handler(req, res) {
           status: 'BLOCKED',
           reason: 'Inappropriate content detected',
           scores: {
-            nudity: Math.max(nudity.sexual_activity || 0, nudity.sexual_display || 0),
+            nudity: Math.max(nudity.sexual_activity || 0, nudity.sexual_display || 0, nudity.erotica || 0),
             weapon: data.weapon || 0,
             drugs: data.drugs || 0,
             offensive: data.offensive?.prob || 0,
