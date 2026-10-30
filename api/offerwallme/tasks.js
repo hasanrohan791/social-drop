@@ -2,17 +2,30 @@
 import admin from "firebase-admin";
 import crypto from "crypto";
 
+// ==========================================
+// 1. FIREBASE INITIALIZATION
+// ==========================================
+
 if (!admin.apps.length) {
+  const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+
+  if (!serviceAccount) {
+    throw new Error("FIREBASE_SERVICE_ACCOUNT is missing");
+  }
+
   admin.initializeApp({
     credential: admin.credential.cert(
-      JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+      JSON.parse(serviceAccount)
     ),
   });
 }
 
 const db = admin.firestore();
 
-// Create Offerwall.me signed user identity
+// ==========================================
+// 2. SIGNED USER IDENTITY
+// ==========================================
+
 function getSignedIdentity(userId) {
   const publicKey = process.env.OFFERWALLME_PUBLIC_API_KEY;
   const secret = process.env.OFFERWALLME_SECRET_KEY;
@@ -36,16 +49,26 @@ function getSignedIdentity(userId) {
   return { expires, signature };
 }
 
-// Translate task content into Bangla
+// ==========================================
+// 3. BANGLA TRANSLATION
+// ==========================================
+
 async function translateTasksToBangla(tasks) {
   const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
 
-  if (!apiKey) {
-    throw new Error("GOOGLE_TRANSLATE_API_KEY is missing");
+  // Translation key না থাকলে Original English দেখাবে।
+  if (!apiKey || tasks.length === 0) {
+    console.warn("Translation key missing; using English");
+
+    return tasks.map(task => ({
+      ...task,
+      titleBn: "",
+      descriptionBn: "",
+      instructionsBn: "",
+    }));
   }
 
-  if (!tasks.length) return [];
-
+  // প্রতিটি Task-এর তিনটি লেখা অনুবাদ হবে।
   const fields = [];
 
   for (const task of tasks) {
@@ -54,67 +77,102 @@ async function translateTasksToBangla(tasks) {
     fields.push(task.instructions || "");
   }
 
-  const translations = [];
+  const translated = [];
 
-  // Translate in batches to avoid oversized requests
-  for (let i = 0; i < fields.length; i += 50) {
-    const batch = fields.slice(i, i + 50);
+  try {
+    // একবারে সর্বোচ্চ 30টি লেখা পাঠানো হবে।
+    for (let i = 0; i < fields.length; i += 30) {
+      const batch = fields.slice(i, i + 30);
 
-    const params = new URLSearchParams();
-    params.append("target", "bn");
-    params.append("format", "text");
+      const params = new URLSearchParams();
 
-    for (const value of batch) {
-      params.append("q", value || " ");
-    }
+      params.append("target", "bn");
+      params.append("format", "text");
 
-    const response = await fetch(
-      `https://translation.googleapis.com/language/translate/v2?key=${encodeURIComponent(apiKey)}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: params.toString(),
-        signal: AbortSignal.timeout(15000),
+      for (const value of batch) {
+        params.append("q", value || " ");
       }
-    );
 
-    if (!response.ok) {
-      throw new Error("Bangla translation request failed");
+      const response = await fetch(
+        "https://translation.googleapis.com/language/translate/v2",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: params.toString() +
+            "&key=" + encodeURIComponent(apiKey),
+          signal: AbortSignal.timeout(15000),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Google Translation HTTP ${response.status}`
+        );
+      }
+
+      const result = await response.json();
+
+      const items = result?.data?.translations;
+
+      if (!Array.isArray(items) || items.length !== batch.length) {
+        throw new Error("Invalid translation response");
+      }
+
+      translated.push(
+        ...items.map(item => item.translatedText || "")
+      );
     }
 
-    const result = await response.json();
+    // English এবং Bangla একসঙ্গে ফেরত পাঠানো।
+    return tasks.map((task, index) => ({
+      ...task,
 
-    const batchTranslations =
-      result?.data?.translations || [];
+      titleBn: translated[index * 3] || "",
+      descriptionBn: translated[index * 3 + 1] || "",
+      instructionsBn: translated[index * 3 + 2] || "",
+    }));
 
-    if (batchTranslations.length !== batch.length) {
-      throw new Error("Incomplete translation response");
-    }
+  } catch (error) {
+    // Translation ব্যর্থ হলেও Task Loading বন্ধ হবে না।
+    console.error("Bangla translation failed:", error.message);
 
-    translations.push(...batchTranslations);
+    return tasks.map(task => ({
+      ...task,
+      titleBn: "",
+      descriptionBn: "",
+      instructionsBn: "",
+    }));
   }
-
-  return tasks.map((task, index) => ({
-    ...task,
-
-    // Original English content remains unchanged
-    title: task.title,
-    description: task.description,
-    instructions: task.instructions,
-
-    // Bangla translations
-    titleBn:
-      translations[index * 3]?.translatedText || "",
-
-    descriptionBn:
-      translations[index * 3 + 1]?.translatedText || "",
-
-    instructionsBn:
-      translations[index * 3 + 2]?.translatedText || "",
-  }));
 }
+
+// ==========================================
+// 4. GET USER IP AND COUNTRY
+// ==========================================
+
+function getUserNetworkInfo(req) {
+  const forwardedFor =
+    req.headers["x-vercel-forwarded-for"] ||
+    req.headers["x-forwarded-for"];
+
+  const ip = typeof forwardedFor === "string"
+    ? forwardedFor.split(",")[0].trim()
+    : "";
+
+  const countryHeader =
+    req.headers["x-vercel-ip-country"];
+
+  const country = typeof countryHeader === "string"
+    ? countryHeader.trim().toUpperCase()
+    : "";
+
+  return { ip, country };
+}
+
+// ==========================================
+// 5. MAIN TASK API
+// ==========================================
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -126,8 +184,12 @@ export default async function handler(req, res) {
     });
   }
 
+  let stage = "initialization";
+
   try {
-    // 1. Verify Firebase user
+    // Firebase authentication
+    stage = "authentication";
+
     const authorization = req.headers.authorization || "";
     const match = authorization.match(/^Bearer\s+(.+)$/i);
 
@@ -141,42 +203,37 @@ export default async function handler(req, res) {
     const decoded = await admin.auth().verifyIdToken(match[1]);
     const userId = decoded.uid;
 
-    // 2. Check API credentials
+    // Environment variables
+    stage = "configuration";
+
     const publicKey = process.env.OFFERWALLME_PUBLIC_API_KEY;
     const bearerToken = process.env.OFFERWALLME_BEARER_TOKEN;
 
-    if (!publicKey || !bearerToken ||
-        !process.env.OFFERWALLME_SECRET_KEY) {
-      return res.status(500).json({
-        success: false,
-        error: "Offerwall configuration missing",
-      });
+    if (
+      !publicKey ||
+      !bearerToken ||
+      !process.env.OFFERWALLME_SECRET_KEY
+    ) {
+      throw new Error("Offerwall.me environment variables missing");
     }
 
-    // 3. Get user IP and country from Vercel headers
-    const ipHeader = req.headers["x-vercel-forwarded-for"];
+    // User IP and country
+    stage = "network";
 
-    const ip = typeof ipHeader === "string"
-      ? ipHeader.split(",")[0].trim()
-      : "";
+    const { ip, country } = getUserNetworkInfo(req);
 
-    const countryHeader = req.headers["x-vercel-ip-country"];
-
-    const country = typeof countryHeader === "string"
-      ? countryHeader.trim().toUpperCase()
-      : "";
-
-    if (!ip || !country || !/^[A-Z]{2}$/.test(country)) {
-      return res.status(400).json({
-        success: false,
-        error: "User IP or country unavailable",
-      });
+    if (!ip || !/^[A-Z]{2}$/.test(country)) {
+      throw new Error("User IP or country unavailable");
     }
 
-    // 4. Generate signed identity
+    // Signed identity
+    stage = "identity";
+
     const identity = getSignedIdentity(userId);
 
-    // 5. Fetch live tasks from Offerwall.me
+    // Offerwall.me API request
+    stage = "provider_api";
+
     const url = new URL(
       "https://offerwall.me/taskapi.php"
     );
@@ -191,7 +248,7 @@ export default async function handler(req, res) {
       identitySignature: identity.signature,
     }).toString();
 
-    const response = await fetch(url, {
+    const providerResponse = await fetch(url, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -199,54 +256,86 @@ export default async function handler(req, res) {
       signal: AbortSignal.timeout(15000),
     });
 
-    const result = await response.json().catch(() => null);
+    const providerResult = await providerResponse.json();
 
-    if (!response.ok || !result ||
-        Number(result.status) !== 200) {
-      return res.status(502).json({
-        success: false,
-        error: "Unable to fetch Offerwall.me tasks",
-      });
+    if (!providerResponse.ok) {
+      throw new Error(
+        `Offerwall.me HTTP ${providerResponse.status}`
+      );
     }
 
-    const providerTasks = Array.isArray(result.data)
-      ? result.data
+    if (Number(providerResult?.status) !== 200) {
+      console.error(
+        "Offerwall.me response:",
+        JSON.stringify(providerResult).slice(0, 1000)
+      );
+
+      throw new Error("Offerwall.me rejected the request");
+    }
+
+    const providerTasks = Array.isArray(providerResult.data)
+      ? providerResult.data
       : [];
 
-    // 6. Get this user's submitted tasks
+    // ======================================
+    // 6. REMOVE TASKS ALREADY SUBMITTED
+    // ======================================
+
+    stage = "submission_history";
+
     const submissionSnapshot = await db
       .collection("offerwallSubmissions")
       .where("userId", "==", userId)
       .get();
 
-    const submittedTaskIds = new Set(
-      submissionSnapshot.docs
-        .filter(doc => {
-          return doc.data().status !== "submission_failed";
-        })
-        .map(doc => String(doc.data().taskId))
-    );
+    const submittedTaskIds = new Set();
 
-    // 7. Only show tasks currently returned by provider
+    for (const document of submissionSnapshot.docs) {
+      const submission = document.data();
+
+      if (
+        submission.status !== "submission_failed" &&
+        submission.taskId
+      ) {
+        submittedTaskIds.add(
+          String(submission.taskId)
+        );
+      }
+    }
+
+    // ======================================
+    // 7. FORMAT LIVE PROVIDER TASKS
+    // ======================================
+
+    stage = "task_formatting";
+
     const tasks = providerTasks
       .filter(task => {
-        const taskId = String(task.id || "");
+        const id = String(task?.id || "");
 
-        return taskId &&
-          !submittedTaskIds.has(taskId);
+        return id && !submittedTaskIds.has(id);
       })
       .map(task => ({
         id: String(task.id),
 
+        // Original English
         title: String(task.title || ""),
         description: String(task.description || ""),
         instructions: String(task.instructions || ""),
 
+        // Bangla translation placeholders
+        titleBn: "",
+        descriptionBn: "",
+        instructionsBn: "",
+
+        // Proof
         proofType: String(task.proof_type || "Text"),
         proofText: String(task.proof_text || ""),
 
+        // Reward
         reward: Number(task.reward || 0),
 
+        // Task details
         countries: Array.isArray(task.countries)
           ? task.countries
           : [],
@@ -254,32 +343,40 @@ export default async function handler(req, res) {
         approvalTime: Number(task.approval_time || 0),
         interval: Number(task.interval || 0),
 
+        // URL
         hasUrl: Boolean(task.has_url),
         url: String(task.url || ""),
-
-        titleBn: "",
-        descriptionBn: "",
-        instructionsBn: "",
       }));
 
-    // 8. Translate all task content
-    const translatedTasks =
-      await translateTasksToBangla(tasks);
+    // ======================================
+    // 8. TRANSLATE TASKS
+    // ======================================
 
-    // 9. Return original English + Bangla
+    stage = "translation";
+
+    const finalTasks = await translateTasksToBangla(tasks);
+
+    // ======================================
+    // 9. SEND RESPONSE
+    // ======================================
+
     return res.status(200).json({
       success: true,
       message: "Tasks loaded successfully",
-      messageBn: "টাস্কের তালিকা পাওয়া গেছে",
-      totalTasks: translatedTasks.length,
-      tasks: translatedTasks,
+      messageBn: "টাস্ক সফলভাবে লোড হয়েছে",
+
+      totalTasks: finalTasks.length,
+
+      languageAvailable: ["en", "bn"],
+
+      tasks: finalTasks,
     });
 
   } catch (error) {
-    console.error(
-      "Offerwall.me tasks error:",
-      error.message
-    );
+    console.error("TASK API ERROR:", {
+      stage,
+      message: error.message,
+    });
 
     if (
       error.code === "auth/id-token-expired" ||
@@ -288,13 +385,14 @@ export default async function handler(req, res) {
     ) {
       return res.status(401).json({
         success: false,
-        error: "Please login again",
+        error: "Login expired. Please login again.",
       });
     }
 
     return res.status(500).json({
       success: false,
       error: "Task loading failed",
+      stage,
     });
   }
 }
